@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url  # <-- 1. IMPORT ADICIONADO
+import dj_database_url  # <-- IMPORT ADICIONADO
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,10 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-41sq)-djgpt%*ggw(c!a4+f7kfenhv90uyp3-f2tdvdgqrz=m!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# 2. DEBUG MODIFICADO (desliga automaticamente no Render)
+# DEBUG MODIFICADO (desliga automaticamente no Render)
 DEBUG = 'RENDER' not in os.environ
 
-# 3. ALLOWED_HOSTS MODIFICADO (aceita o site do Render)
+# ALLOWED_HOSTS MODIFICADO (aceita o site do Render)
 ALLOWED_HOSTS = ['127.0.0.1']
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# 4. SEÇÃO DATABASES MODIFICADA (usa sqlite local, mas PostgreSQL no Render)
+# SEÇÃO DATABASES MODIFICADA (usa sqlite local, mas PostgreSQL no Render)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -128,4 +128,20 @@ USE_I18N = True
 USE_TZ = True
 
 
-#
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+
+STATIC_URL = 'static/' # <-- CORREÇÃO: ADICIONADO STATIC_URL
+
+STATICFILES_DIRS = [ # <-- BOA PRÁTICA: Adicionado diretório de estáticos para desenvolvimento local
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# LINHA ADICIONADA (para o Render encontrar seus arquivos estáticos)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
