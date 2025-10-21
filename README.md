@@ -16,7 +16,7 @@ Repositório para o projeto.
 ### Semana 8
 * Implementação da primeira história: **Streak de Leitura Diária**.
 
-### Semana 9 (O que fizemos hoje)
+### Semana 9
 * Implementação da segunda história: **Rotina de Interesses e Metas**.
 * Criação da funcionalidade de **Cadastro de Interesses**.
 * Correção do ambiente virtual (`venv`) e deploy no Render.
