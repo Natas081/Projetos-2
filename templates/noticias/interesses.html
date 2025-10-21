@@ -1,0 +1,41 @@
+{% extends "noticias/base.html" %} {% block content %}
+<div class="container">
+    <h2>Meus Interesses</h2>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h3>Adicionar Novo Interesse</h3>
+    <form method="POST" action="{% url 'pagina_de_interesses' %}" class="mb-4">
+        {% csrf_token %}
+        <div class="input-group">
+            <input type="text" name="name" class="form-control" placeholder="Ex: Tecnologia" required>
+            <button type="submit" class="btn btn-primary">Adicionar</button>
+        </div>
+    </form>
+
+    <hr>
+
+    <h3>Seus Interesses Atuais</h3>
+    {% if interests_list %}
+        <ul class="list-group">
+            {% for interest in interests_list %}
+                <li class="list-group-item">
+                    {{ interest.name }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Você ainda não cadastrou nenhum interesse.</p>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'routine' %}" class="btn btn-secondary">Voltar para a Rotina</a>
+
+</div>
+{% endblock %}

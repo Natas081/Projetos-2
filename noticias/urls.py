@@ -2,8 +2,15 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # URL da página inicial, ex: http://127.0.0.1:8000/
+    # Sua URL da página inicial
     path('', views.home, name='home'),
-    # URL que será chamada pelo formulário para registrar o check-in
-    path('registrar-checkin/', views.registrar_checkin, name='registrar_checkin'),
+    
+    # URL da nova página de "Rotina de Interesses"
+    path('rotina/', views.routine_view, name='routine'),
+    
+    # URL que faz o "check" da notícia (Atualiza o Streak E a Meta)
+    path('noticia/<int:news_id>/check/', views.check_news_view, name='check_news'),
+    
+    # URL da página de "Gerenciar Interesses" (que você acabou de criar)
+    path('interesses/', views.gerenciar_interesses, name='pagina_de_interesses'),
 ]

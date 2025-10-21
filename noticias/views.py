@@ -1,64 +1,131 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from .models import Goal, Interest, Noticia, Perfil, CheckIn
 from datetime import date, timedelta
-from .models import CheckIn, Perfil
 
+# Assumindo que você tenha uma view 'home' em algum lugar
+# Se não, você precisará criá-la ou ajustar os redirects
 @login_required
 def home(request):
-    """
-    Exibe a página principal, o prompt de check-in e a sequência do usuário.
-    """
-    hoje = date.today()
-    usuario = request.user
-    
-    # --- CORREÇÃO AQUI ---
-    # Garante que um perfil exista para o usuário logado.
-    # Se não existir, ele cria um novo. Se já existir, ele apenas o pega.
-    perfil, created = Perfil.objects.get_or_create(usuario=usuario)
-    
-    # Verifica se o usuário já fez check-in hoje
-    checkin_hoje_existe = CheckIn.objects.filter(usuario=usuario, data_checkin=hoje).exists()
-    
-    contexto = {
-        'mostrar_prompt_checkin': not checkin_hoje_existe,
-        'streak_atual': perfil.leitura_streak
+    # Lógica da sua página inicial
+    noticias = Noticia.objects.all() # Exemplo
+    context = {
+        'noticias': noticias
     }
-    return render(request, 'noticias/home.html', contexto)
+    return render(request, 'noticias/home.html', context)
 
 
 @login_required
-def registrar_checkin(request):
-    """
-    Processa o clique no botão "SIM" para registrar o check-in.
-    """
+def routine_view(request):
+    user = request.user
+    start_of_week = Goal.get_start_of_week()
+
+    Goal.objects.filter(
+        user=user,
+        weekStartDate__lt=start_of_week
+    ).update(
+        currentProgress=0,
+        weekStartDate=start_of_week
+    )
+    
     if request.method == 'POST':
-        hoje = date.today()
-        ontem = hoje - timedelta(days=1)
-        usuario = request.user
+        try:
+            interest_id = request.POST.get('interest_id')
+            frequency = int(request.POST.get('frequency', 0))
+
+            if frequency <= 0:
+                messages.error(request, "Frequência inválida, insira um valor positivo")
+                return redirect('routine') 
+
+            interest = get_object_or_404(Interest, id=interest_id, user=user)
+
+            Goal.objects.update_or_create(
+                user=user,
+                interest=interest,
+                weekStartDate=start_of_week,
+                defaults={'targetFrequency': frequency}
+            )
+            messages.success(request, f"Meta para '{interest.name}' salva!")
+
+        except (ValueError, TypeError):
+            messages.error(request, "Dados inválidos.")
+        except Interest.DoesNotExist:
+            messages.error(request, "Interesse não encontrado.")
         
-        # A mesma lógica de get_or_create aqui para garantir
-        perfil, created = Perfil.objects.get_or_create(usuario=usuario)
+        return redirect('routine')
 
-        # Cenário 3: Verifica se já não existe um check-in para hoje
-        if CheckIn.objects.filter(usuario=usuario, data_checkin=hoje).exists():
-            messages.warning(request, 'Você já registrou seu check-in hoje.')
-            return redirect('home')
+    user_interests = Interest.objects.filter(user=user)
 
-        # Cenário 1: Registra o check-in e atualiza o streak
-        CheckIn.objects.create(usuario=usuario, data_checkin=hoje)
-        
-        # Verifica se houve check-in ontem para continuar a sequência
-        checkin_ontem_existe = CheckIn.objects.filter(usuario=usuario, data_checkin=ontem).exists()
+    if not user_interests.exists():
+        return render(request, 'noticias/routine.html', {'has_interests': False})
 
-        if checkin_ontem_existe:
-            perfil.leitura_streak += 1 # Continua a sequência
+    current_goals = Goal.objects.filter(user=user, weekStartDate=start_of_week)
+    context = {
+        'has_interests': True,
+        'interests_list': user_interests, 
+        'goals_list': current_goals,
+    }
+    return render(request, 'noticias/routine.html', context)
+
+
+@login_required
+def check_news_view(request, news_id):
+    user = request.user
+    noticia = get_object_or_404(Noticia, id=news_id)
+    today = date.today()
+    
+    checkin, created = CheckIn.objects.get_or_create(usuario=user, data_checkin=today)
+    if created:
+        perfil = user.perfil 
+        yesterday = today - timedelta(days=1)
+        if CheckIn.objects.filter(usuario=user, data_checkin=yesterday).exists():
+            perfil.leitura_streak += 1
         else:
-            perfil.leitura_streak = 1 # Inicia uma nova sequência
-        
+            perfil.leitura_streak = 1
         perfil.save()
-        messages.success(request, 'Check-in registrado com sucesso! Continue assim!')
 
-    # Cenário 2 (implícito): Se não for POST ou se o usuário sair, nada acontece,
-    # e na próxima vez a lógica de streak vai reiniciar a contagem.
+    if noticia.interest: 
+        start_of_week = Goal.get_start_of_week()
+        try:
+            goal_to_update = Goal.objects.get(
+                user=user,
+                interest=noticia.interest,
+                weekStartDate=start_of_week
+            )
+            if goal_to_update.currentProgress < goal_to_update.targetFrequency:
+                goal_to_update.currentProgress += 1
+                goal_to_update.save()
+        except Goal.DoesNotExist:
+            pass 
+            
     return redirect('home')
+
+
+@login_required
+def gerenciar_interesses(request):
+    user = request.user
+
+    if request.method == 'POST':
+        interest_name = request.POST.get('name')
+        
+        if interest_name:
+            interest, created = Interest.objects.get_or_create(
+                user=user, 
+                name=interest_name.strip()
+            )
+            if created:
+                messages.success(request, f"Interesse '{interest.name}' adicionado!")
+            else:
+                messages.info(request, f"Interesse '{interest.name}' já existe.")
+        else:
+            messages.error(request, "O nome do interesse não pode ser vazio.")
+        
+        return redirect('pagina_de_interesses')
+
+    current_interests = Interest.objects.filter(user=user)
+    
+    context = {
+        'interests_list': current_interests
+    }
+    return render(request, 'noticias/interesses.html', context)
