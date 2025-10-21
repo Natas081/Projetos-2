@@ -1,0 +1,64 @@
+{% extends "noticias/base.html" %} {% block content %} <div class="text-center">
+    
+    <h2 class="display-5 fw-bold">Olá, {{ user.username }}!</h2>
+    
+    <p class="lead mb-4">Acompanhe seu hábito de leitura diária.</p>
+
+    <div class="rounded p-4 mb-4" style="background-color: #f0f0ff;">
+        <h4 class="fw-normal">Sua sequência de leitura atual é:</h4>
+        <span class="display-3 fw-bold text-primary">
+            <i class="bi bi-fire text-danger"></i>
+            {{ user.perfil.leitura_streak }} dia(s)
+        </span>
+    </div>
+
+    {% if ja_fez_checkin_hoje %}
+        <p class="fs-5 text-success fw-bold">
+            <i class="bi bi-calendar-check-fill"></i>
+            Você já fez seu check-in hoje. Volte amanhã!
+        </p>
+    {% else %}
+        <p class="fs-5 text-muted">Você ainda não fez seu check-in hoje.</p>
+    {% endif %}
+
+    <hr class="my-4">
+
+    <h4 class="mb-3">Notícias de Hoje</h4>
+    {% for noticia in noticias %}
+        <div class="card mb-2 text-start">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title mb-1">{{ noticia.titulo }}</h5>
+                    <small class="text-muted">Interesse: {{ noticia.interest.name|default:"Geral" }}</small>
+                </div>
+                <div class="ms-2">
+                    <a href="{{ noticia.link }}" target="_blank" class="btn btn-secondary btn-sm" title="Ler Notícia">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                    
+                    {% if not ja_fez_checkin_hoje %}
+                    <form action="{% url 'check_news' noticia.id %}" method="POST" style="display: inline;" title="Marcar como lida">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-muted">Nenhuma notícia encontrada.</p>
+    {% endfor %}
+
+</div>
+
+{% endblock %} ```
+
+### E agora?
+
+Depois de **salvar** o arquivo `streak.html` com este novo código, volte para o seu navegador e **atualize** a página:
+
+`http://127.0.0.1:8000/`
+
+O menu com os botões "Streak", "Interesses" e "Rotina" VAI aparecer no topo.

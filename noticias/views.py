@@ -9,12 +9,18 @@ from datetime import date, timedelta
 @login_required
 def home(request):
     # Lógica da sua página inicial
-    noticias = Noticia.objects.all() # Exemplo
+    noticias = Noticia.objects.all() # Exemplo de busca de notícias
+    
+    # --- ★ NOVO CÓDIGO ADICIONADO ★ ---
+    # Verifica se o usuário já fez check-in hoje
+    today = date.today()
+    ja_fez_checkin_hoje = CheckIn.objects.filter(usuario=request.user, data_checkin=today).exists()
+    
     context = {
-        'noticias': noticias
+        'noticias': noticias,
+        'ja_fez_checkin_hoje': ja_fez_checkin_hoje # Passa a variável para o template
     }
-    return render(request, 'noticias/home.html', context)
-
+    return render(request, 'noticias/streak.html', context)
 
 @login_required
 def routine_view(request):
@@ -129,3 +135,23 @@ def gerenciar_interesses(request):
         'interests_list': current_interests
     }
     return render(request, 'noticias/interesses.html', context)
+
+
+# --- ★ NOVO CÓDIGO ADICIONADO ABAIXO ★ ---
+
+@login_required
+def delete_interest_view(request, interest_id):
+    """
+    View para apagar um interesse.
+    """
+    # Busca o interesse, mas garante que ele pertence ao usuário logado
+    interest = get_object_or_404(Interest, id=interest_id, user=request.user)
+    
+    # Usamos POST para segurança (nunca delete com GET)
+    if request.method == 'POST':
+        interest_name = interest.name
+        interest.delete()
+        messages.success(request, f"Interesse '{interest_name}' removido com sucesso.")
+    
+    # Redireciona de volta para a página de gerenciamento
+    return redirect('pagina_de_interesses')

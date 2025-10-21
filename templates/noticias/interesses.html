@@ -1,41 +1,55 @@
-{% extends "noticias/base.html" %} {% block content %}
-<div class="container">
-    <h2>Meus Interesses</h2>
+{% extends "noticias/base.html" %}
 
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+{% block content %}
 
-    <h3>Adicionar Novo Interesse</h3>
-    <form method="POST" action="{% url 'pagina_de_interesses' %}" class="mb-4">
-        {% csrf_token %}
-        <div class="input-group">
-            <input type="text" name="name" class="form-control" placeholder="Ex: Tecnologia" required>
-            <button type="submit" class="btn btn-primary">Adicionar</button>
-        </div>
-    </form>
+<h2 class="text-center mb-4">
+    <i class="bi bi-bookmark-star-fill text-primary"></i>
+    Meus Interesses
+</h2>
 
-    <hr>
+<form method="POST" action="{% url 'pagina_de_interesses' %}" class="mb-4">
+    {% csrf_token %}
+    <label for="name" class="form-label"><strong>Adicionar Novo Interesse</strong></label>
+    <div class="input-group">
+        <input type="text" name="name" id="name" class="form-control" placeholder="Ex: Tecnologia" required>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Adicionar
+        </button>
+    </div>
+</form>
 
-    <h3>Seus Interesses Atuais</h3>
-    {% if interests_list %}
-        <ul class="list-group">
-            {% for interest in interests_list %}
-                <li class="list-group-item">
+<hr class="my-4">
+
+<h3 class="h4">Seus Interesses Atuais</h3>
+{% if interests_list %}
+    <ul class="list-group list-group-flush">
+        {% for interest in interests_list %}
+            
+            <li class="list-group-item d-flex justify-content-between align-items-center fs-5">
+                
+                <span>
+                    <i class="bi bi-bookmark-check text-success me-2"></i>
                     {{ interest.name }}
-                </li>
+                </span>
+
+                <form method="POST" action="{% url 'delete_interest' interest.id %}" onsubmit="return confirm('Tem certeza que quer apagar este interesse?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </form>
+                
+            </li>
             {% endfor %}
-        </ul>
-    {% else %}
-        <p>Você ainda não cadastrou nenhum interesse.</p>
-    {% endif %}
+    </ul>
+{% else %}
+    <p class="text-muted text-center">Você ainda não cadastrou nenhum interesse.</p>
+{% endif %}
 
-    <br>
-    <a href="{% url 'routine' %}" class="btn btn-secondary">Voltar para a Rotina</a>
-
+<div class="text-center mt-4">
+    <a href="{% url 'routine' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar para a Rotina
+    </a>
 </div>
+
 {% endblock %}
