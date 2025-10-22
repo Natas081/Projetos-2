@@ -14,16 +14,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# -------------------- CORREÇÃO DA SECRET KEY --------------------
+# -------------------- SECRET KEY --------------------
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-41sq)-djgpt%*ggw(c!a4+f7kfenhv90uyp3-f2tdvdgqrz=m!')
-# -----------------------------------------------------------------
+# ----------------------------------------------------
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG MODIFICADO (desliga automaticamente no Render)
 DEBUG = 'RENDER' not in os.environ
 
-# -------------------- CORREÇÃO CRÍTICA DO ALLOWED_HOSTS --------------------
+# -------------------- ALLOWED_HOSTS --------------------
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] # Hosts locais
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -31,7 +31,7 @@ if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
     # Adiciona o subdomínio genérico do Render para maior compatibilidade
     ALLOWED_HOSTS.append('.onrender.com')
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------
 
 
 # Application definition
@@ -59,7 +59,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# ★ CORREÇÃO: VERIFIQUE SE 'project' É O NOME CORRETO DO SEU DIRETÓRIO PRINCIPAL ★
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
@@ -78,7 +77,6 @@ TEMPLATES = [
     },
 ]
 
-# ★ CORREÇÃO: VERIFIQUE SE 'project' É O NOME CORRETO DO SEU DIRETÓRIO PRINCIPAL ★
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
@@ -97,10 +95,46 @@ if 'DATABASE_URL' in os.environ:
     )
 
 
-# Password validation (mantido)
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.Minimum
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', # CORRIGIDO: String completa
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = 'static/' 
+
+STATICFILES_DIRS = [ 
+    os.path.join(BASE_DIR, 'static'),
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configurações de Autenticação
+LOGIN_URL = 'login' 
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
