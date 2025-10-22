@@ -14,8 +14,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-41sq)-djgpt%*ggw(c!a4+f7kfenhv90uyp3-f2tdvdgqrz=m!'
+# -------------------- CORREÇÃO DA SECRET KEY --------------------
+# Usa a variável de ambiente no Render, com o valor de backup 'hardcoded'
+# Isso garante que a chave seja lida imediatamente, resolvendo o problema de roteamento
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-41sq)-djgpt%*ggw(c!a4+f7kfenhv90uyp3-f2tdvdgqrz=m!')
+# -----------------------------------------------------------------
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG MODIFICADO (desliga automaticamente no Render)
