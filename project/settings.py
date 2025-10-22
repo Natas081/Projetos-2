@@ -15,8 +15,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # -------------------- CORREÇÃO DA SECRET KEY --------------------
-# Usa a variável de ambiente no Render, com o valor de backup 'hardcoded'
-# Isso garante que a chave seja lida imediatamente, resolvendo o problema de roteamento
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-41sq)-djgpt%*ggw(c!a4+f7kfenhv90uyp3-f2tdvdgqrz=m!')
 # -----------------------------------------------------------------
 
@@ -25,12 +23,17 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-41sq)-djgpt%*ggw(c!a4
 # DEBUG MODIFICADO (desliga automaticamente no Render)
 DEBUG = 'RENDER' not in os.environ
 
-# ALLOWED_HOSTS MODIFICADO (aceita o site do Render)
-ALLOWED_HOSTS = ['127.0.0.1']
+# -------------------- CORREÇÃO CRÍTICA DO ALLOWED_HOSTS --------------------
+# Garante que hosts de produção sejam aceitos. 
+# Adiciona o host do Render E o subdomínio genérico para evitar problemas.
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] # Hosts locais
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    # Adiciona o subdomínio genérico do Render para maior compatibilidade
+    ALLOWED_HOSTS.append('.onrender.com')
+# ---------------------------------------------------------------------------
 
 
 # Application definition
@@ -43,11 +46,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'noticias',
+    # Adicione aqui o Whitenoise se você usar um Django mais recente:
+    # 'whitenoise.runserver_nostatic', 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # --- ADIÇÃO NECESSÁRIA PARA O CSS NO RENDER ---
+    # --- ADIÇÃO NECESSÁRIA PARA O CSS NO RENDER (MUITO BEM!) ---
     'whitenoise.middleware.WhiteNoiseMiddleware',
     # --------------------------------------------
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,9 +85,6 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# SEÇÃO DATABASES MODIFICADA (usa sqlite local, mas PostgreSQL no Render)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -98,8 +100,6 @@ if 'DATABASE_URL' in os.environ:
 
 
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -117,8 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -129,15 +127,12 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/' # <-- CORREÇÃO: ADICIONADO STATIC_URL
 
-STATICFILES_DIRS = [ # <-- BOA PRÁTICA: Adicionado diretório de estáticos para desenvolvimento local
+STATICFILES_DIRS = [ 
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# LINHA ADICIONADA (para o Render encontrar seus arquivos estáticos)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # --- CONFIGURAÇÃO DO WHITE NOISE (CSS/JS) ---
@@ -146,6 +141,11 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# -------------------- ADIÇÃO NECESSÁRIA PARA REDIRECIONAMENTO --------------------
+# Garante que o Django saiba para onde ir após o login/logout.
+LOGIN_URL = '/accounts/login/' # URL padrão do Django Auth
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+# ----------------------------------------------------------------------------------
