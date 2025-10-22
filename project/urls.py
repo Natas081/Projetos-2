@@ -1,13 +1,11 @@
+# project/urls.py
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
-    # IMPORTANTE: Inclui as URLs de login/logout, etc.
-    # Elas serão acessíveis em /accounts/login/, /accounts/logout/, etc.
+    # ESSA LINHA PRECISA EXISTIR!
     path('accounts/', include('django.contrib.auth.urls')), 
-    
-    # ESSA LINHA GARANTE QUE AS ROTAS DO 'noticias/urls.py' SEJAM ACESSADAS NA RAIZ (/)
-    path('', include('noticias.urls')),
+    # ESSA LINHA PRECISA EXISTIR E USAR O NOME CORRETO DA SUA APP!
+    path('', include('noticias.urls')), 
 ]
