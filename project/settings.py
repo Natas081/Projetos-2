@@ -24,8 +24,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-41sq)-djgpt%*ggw(c!a4
 DEBUG = 'RENDER' not in os.environ
 
 # -------------------- CORREÇÃO CRÍTICA DO ALLOWED_HOSTS --------------------
-# Garante que hosts de produção sejam aceitos. 
-# Adiciona o host do Render E o subdomínio genérico para evitar problemas.
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] # Hosts locais
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -46,15 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'noticias',
-    # Adicione aqui o Whitenoise se você usar um Django mais recente:
-    # 'whitenoise.runserver_nostatic', 
+    # Adiciona whitenoise para servir arquivos estáticos em dev (boa prática)
+    'whitenoise.runserver_nostatic', 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # --- ADIÇÃO NECESSÁRIA PARA O CSS NO RENDER (MUITO BEM!) ---
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    # --------------------------------------------
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -63,6 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# ★ CORREÇÃO: VERIFIQUE SE 'project' É O NOME CORRETO DO SEU DIRETÓRIO PRINCIPAL ★
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
@@ -81,6 +78,7 @@ TEMPLATES = [
     },
 ]
 
+# ★ CORREÇÃO: VERIFIQUE SE 'project' É O NOME CORRETO DO SEU DIRETÓRIO PRINCIPAL ★
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
@@ -99,53 +97,10 @@ if 'DATABASE_URL' in os.environ:
     )
 
 
-# Password validation
+# Password validation (mantido)
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
-
-# Internationalization
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/' # <-- CORREÇÃO: ADICIONADO STATIC_URL
-
-STATICFILES_DIRS = [ 
-    os.path.join(BASE_DIR, 'static'),
-]
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# --- CONFIGURAÇÃO DO WHITE NOISE (CSS/JS) ---
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# ---------------------------------------------
-
-
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# -------------------- ADIÇÃO NECESSÁRIA PARA REDIRECIONAMENTO --------------------
-# Garante que o Django saiba para onde ir após o login/logout.
-LOGIN_URL = '/accounts/login/' # URL padrão do Django Auth
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
-# ----------------------------------------------------------------------------------
+        'NAME': 'django.contrib.auth.password_validation.Minimum
