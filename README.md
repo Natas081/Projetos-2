@@ -13,6 +13,7 @@ Repositório para o projeto.
   <summary>- ✅ Semana 6 </summary>
   
   * Criação de 7 histórias de usuário no Google Docs.
+  
 </details>
 
 <details>
@@ -21,12 +22,14 @@ Repositório para o projeto.
   * Conferência das histórias.
   
   * Criação do painel de administração (Admin) do Django.
+  
 </details>
 
 <details>
   <summary>- ✅ Semana 8 </summary>
   
   * Implementação da primeira história: *Streak de Leitura Diária*.
+  
 </details>
 
 <details>
@@ -38,7 +41,7 @@ Repositório para o projeto.
   
   * Correção do ambiente virtual (venv) e deploy no Render.
 
-  * Render https://meujornal.onrender.com/.
+  * Render: https://meujornal.onrender.com/.
 </details>
 
 ---
