@@ -4,8 +4,7 @@ from django.contrib import messages
 # Importações adicionais para autenticação
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
-# Fim das importações de autenticação
-
+# Importação NECESSÁRIA do modelo Perfil
 from .models import Goal, Interest, Noticia, Perfil, CheckIn
 from datetime import date, timedelta
 
@@ -16,6 +15,12 @@ def registro_usuario(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            
+            # --- CORREÇÃO: CRIAÇÃO DO PERFIL ---
+            # Cria o objeto Perfil associado imediatamente ao novo usuário
+            Perfil.objects.create(usuario=user)
+            # ------------------------------------
+            
             # Redireciona para a página de login após o registro bem-sucedido
             messages.success(request, 'Conta criada com sucesso! Faça login.')
             return redirect('login') 
