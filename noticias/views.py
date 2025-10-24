@@ -9,7 +9,6 @@ from .models import Goal, Interest, Noticia, Perfil, CheckIn
 from datetime import date, timedelta
 
 # --- FUNÇÃO DE REGISTRO (CADASTRO) ---
-# Adicionada para lidar com a criação de novos usuários
 def registro_usuario(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -17,39 +16,48 @@ def registro_usuario(request):
             user = form.save()
             
             # --- CORREÇÃO: CRIAÇÃO DO PERFIL ---
-            # Cria o objeto Perfil associado imediatamente ao novo usuário
             Perfil.objects.create(usuario=user)
             # ------------------------------------
             
-            # Redireciona para a página de login após o registro bem-sucedido
             messages.success(request, 'Conta criada com sucesso! Faça login.')
             return redirect('login') 
     else:
         form = UserCreationForm()
     
-    # Renderiza o template de registro (templates/registration/registro.html)
     return render(request, 'registration/registro.html', {'form': form})
 # --------------------------------------
 
-@login_required
+# --- CORREÇÃO FINAL E CRÍTICA ---
+# REMOVIDO @login_required daqui.
+# Esta view (home) precisa ser pública, senão o base.html (usado pelo login)
+# entra em loop de redirecionamento, causando o Erro 500.
 def home(request):
-    # Lógica da sua página inicial
-    noticias = Noticia.objects.all() # Exemplo de busca de notícias
-    
-    # --- NOVO CÓDIGO ADICIONADO ---
-    # Verifica se o usuário já fez check-in hoje
-    today = date.today()
-    ja_fez_checkin_hoje = CheckIn.objects.filter(usuario=request.user, data_checkin=today).exists()
+    noticias = Noticia.objects.all()
+    ja_fez_checkin_hoje = False # Default para usuários deslogados
+
+    # Nós ainda podemos mostrar conteúdo dinâmico se o usuário ESTIVER logado
+    if request.user.is_authenticated:
+        today = date.today()
+        ja_fez_checkin_hoje = CheckIn.objects.filter(usuario=request.user, data_checkin=today).exists()
     
     context = {
         'noticias': noticias,
-        'ja_fez_checkin_hoje': ja_fez_checkin_hoje # Passa a variável para o template
+        'ja_fez_checkin_hoje': ja_fez_checkin_hoje
     }
     return render(request, 'noticias/streak.html', context)
 
 @login_required
 def routine_view(request):
     user = request.user
+# ... (o resto do seu arquivo 'views.py' continua aqui)
+# ... (routine_view, check_news_view, gerenciar_interesses, delete_interest_view)
+# ... (certifique-se de que o resto do arquivo esteja igual ao que você tinha)
+
+# ... (colar o resto das suas views aqui) ...
+# ...
+# ...
+
+# Colar 'routine_view'
     start_of_week = Goal.get_start_of_week()
 
     Goal.objects.filter(
@@ -100,6 +108,7 @@ def routine_view(request):
     return render(request, 'noticias/routine.html', context)
 
 
+# Colar 'check_news_view'
 @login_required
 def check_news_view(request, news_id):
     user = request.user
@@ -132,7 +141,7 @@ def check_news_view(request, news_id):
             
     return redirect('home')
 
-
+# Colar 'gerenciar_interesses'
 @login_required
 def gerenciar_interesses(request):
     user = request.user
@@ -161,7 +170,7 @@ def gerenciar_interesses(request):
     }
     return render(request, 'noticias/interesses.html', context)
 
-
+# Colar 'delete_interest_view'
 @login_required
 def delete_interest_view(request, interest_id):
     """
@@ -178,3 +187,4 @@ def delete_interest_view(request, interest_id):
     
     # Redireciona de volta para a página de gerenciamento
     return redirect('pagina_de_interesses')
+
