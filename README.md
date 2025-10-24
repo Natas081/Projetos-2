@@ -2,6 +2,8 @@
 
 Repositório para o projeto.
 
+---
+
 ## Histórias de Usuário
 
 * [Histórias](https://docs.google.com/document/d/1k3oqyu35CsSUaAo8bYrjgvMH_o0jxMxZRTlyUTqBZyA/edit?tab=t.0)
