@@ -32,7 +32,8 @@
                         
                         <form action="{% url 'logout' %}" method="post" class="ml-4">
                             {% csrf_token %}
-                            <button type_submit" class="px-3 py-2 rounded-md text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100">
+                            <!-- CORREÇÃO: 'type_submit"' alterado para 'type="submit"' -->
+                            <button type="submit" class="px-3 py-2 rounded-md text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100">
                                 Sair ({{ user.username }})
                             </button>
                         </form>
@@ -73,3 +74,4 @@
 
 </body>
 </html>
+
