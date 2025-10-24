@@ -1,8 +1,44 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Goal, Interest, Noticia, Perfil, CheckIn
 from datetime import date, timedelta
+from django.contrib.auth.forms import UserCreationForm # Importação para o formulário de cadastro
+from django.contrib.auth import login # Importação para logar o usuário após o registro
+
+from .models import Goal, Interest, Noticia, Perfil, CheckIn
+
+# ---------------------------------------------------------
+# View de Cadastro de Usuário (NOVA FUNÇÃO)
+# ---------------------------------------------------------
+def registro_usuario(request):
+    """
+    Lida com o registro de novos usuários usando o UserCreationForm padrão do Django.
+    """
+    # Se o método for POST, o usuário enviou o formulário
+    if request.method == 'POST':
+        # Cria uma instância do formulário de criação de usuário com os dados do POST
+        form = UserCreationForm(request.POST)
+        
+        # Verifica se os dados do formulário são válidos
+        if form.is_valid():
+            # Salva o novo usuário no banco de dados
+            user = form.save()
+            
+            # Loga o usuário automaticamente após o registro (boa usabilidade)
+            login(request, user)
+            
+            # Redireciona o usuário para a página inicial ('/')
+            return redirect('/')  
+            
+    # Se o método for GET (ou o formulário for inválido), exibe o formulário
+    else:
+        # Cria uma instância vazia do formulário
+        form = UserCreationForm()
+        
+    # Renderiza o template de registro, passando o formulário para o contexto
+    return render(request, 'registration/registro.html', {'form': form})
+# ---------------------------------------------------------
+
 
 # Assumindo que você tenha uma view 'home' em algum lugar
 # Se não, você precisará criá-la ou ajustar os redirects
@@ -11,7 +47,7 @@ def home(request):
     # Lógica da sua página inicial
     noticias = Noticia.objects.all() # Exemplo de busca de notícias
     
-    # --- ★ NOVO CÓDIGO ADICIONADO ★ ---
+    # --- ★ CÓDIGO EXISTENTE CONTINUA ★ ---
     # Verifica se o usuário já fez check-in hoje
     today = date.today()
     ja_fez_checkin_hoje = CheckIn.objects.filter(usuario=request.user, data_checkin=today).exists()
@@ -83,6 +119,9 @@ def check_news_view(request, news_id):
     
     checkin, created = CheckIn.objects.get_or_create(usuario=user, data_checkin=today)
     if created:
+        # AQUI VOCÊ PODE TER UM ERRO: 'user' não tem atributo 'perfil' diretamente.
+        # Deve ser user.perfil se Perfil for um OneToOneField (ou user.perfil_set.first()).
+        # Assumindo que você tem um OneToOneField chamado 'perfil' no modelo User:
         perfil = user.perfil 
         yesterday = today - timedelta(days=1)
         if CheckIn.objects.filter(usuario=user, data_checkin=yesterday).exists():
@@ -136,8 +175,6 @@ def gerenciar_interesses(request):
     }
     return render(request, 'noticias/interesses.html', context)
 
-
-# --- ★ NOVO CÓDIGO ADICIONADO ABAIXO ★ ---
 
 @login_required
 def delete_interest_view(request, interest_id):
