@@ -1,16 +1,19 @@
 from django.contrib import admin
-from django.urls import path, include 
+from django.urls import path, include
+from noticias.views import registro_usuario # Importa a view de registro personalizada
 
-# Define a lista de padrões de URL para o projeto
 urlpatterns = [
-    # Rota para o painel de administração do Django
+    # Rota para o painel de administração
     path('admin/', admin.site.urls),
     
-    # Rota que inclui as URLs de autenticação padrão do Django (login, logout, etc.).
-    # O Django buscará por templates em 'templates/registration/'
-    path('accounts/', include('django.contrib.auth.urls')), 
+    # Rota personalizada para o REGISTRO de usuário
+    # ESSENCIAL: Mapeia o /accounts/registro/ para a sua view
+    path('accounts/registro/', registro_usuario, name='registro'),
     
-    # Rota para incluir as URLs da sua aplicação principal (notícias).
-    # Esta linha faz com que as URLs de 'noticias' sejam a página inicial (root) do projeto.
+    # Rota Padrão de Autenticação do Django
+    # ESSENCIAL: Inclui as views de login, logout e reset de senha padrao do Django.
+    path('accounts/', include('django.contrib.auth.urls')),
+
+    # Rota para as URLs da sua aplicação 'noticias'
     path('', include('noticias.urls')), 
 ]
