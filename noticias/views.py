@@ -27,24 +27,36 @@ def registro_usuario(request):
     return render(request, 'registration/registro.html', {'form': form})
 # --------------------------------------
 
-# --- CORREÇÃO FINAL E CRÍTICA ---
-# REMOVIDO @login_required daqui.
-# Esta view (home) precisa ser pública, senão o base.html (usado pelo login)
-# entra em loop de redirecionamento, causando o Erro 500.
+# --- CORREÇÃO FINAL E CRÍTICA (PARA O LOOP DE 'WAKING UP') ---
+# A view 'home' está pública (correto), mas precisa de tratar utilizadores anónimos
+# que não têm 'perfil' ou 'checkin'.
 def home(request):
     noticias = Noticia.objects.all()
-    ja_fez_checkin_hoje = False # Default para usuários deslogados
-
-    # Nós ainda podemos mostrar conteúdo dinâmico se o usuário ESTIVER logado
-    if request.user.is_authenticated:
-        today = date.today()
-        ja_fez_checkin_hoje = CheckIn.objects.filter(usuario=request.user, data_checkin=today).exists()
     
+    # Inicializa o contexto com valores padrão para utilizadores anónimos
     context = {
         'noticias': noticias,
-        'ja_fez_checkin_hoje': ja_fez_checkin_hoje
+        'ja_fez_checkin_hoje': False,
+        'perfil': None # Garante que 'perfil' (ou 'user.perfil') exista no contexto
     }
+
+    # Se o usuário ESTIVER logado, preenchemos os dados reais
+    if request.user.is_authenticated:
+        today = date.today()
+        context['ja_fez_checkin_hoje'] = CheckIn.objects.filter(usuario=request.user, data_checkin=today).exists()
+        
+        try:
+            # Tenta obter o perfil
+            context['perfil'] = request.user.perfil
+        except Perfil.DoesNotExist:
+            # Se não existir por algum motivo (improvável após o fix do registro),
+            # cria um agora para evitar falhas.
+            context['perfil'] = Perfil.objects.create(usuario=request.user)
+    
+    # Renderiza o template. Agora é seguro para utilizadores anónimos,
+    # pois 'perfil' será None e 'ja_fez_checkin_hoje' será False.
     return render(request, 'noticias/streak.html', context)
+# -----------------------------------------------------------
 
 @login_required
 def routine_view(request):
