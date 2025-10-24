@@ -73,7 +73,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -124,9 +123,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/' 
 
-STATICFILES_DIRS = [ 
-    os.path.join(BASE_DIR, 'static'),
-]
+# --- CORREÇÃO FINAL ---
+# A linha abaixo estava causando o erro 500 no Render porque a pasta 'static' não existe.
+# Comentamos ela para resolver o aviso W004.
+# STATICFILES_DIRS = [ 
+#     os.path.join(BASE_DIR, 'static'),
+# ]
+# ----------------------
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -143,3 +146,4 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 # Redireciona para a home ('/') após o logout
 LOGOUT_REDIRECT_URL = '/'
+
