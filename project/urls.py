@@ -1,3 +1,4 @@
+# FORÇANDO O DEPLOY
 from django.contrib import admin
 from django.urls import path, include
 # CORREÇÃO CRÍTICA: Importa a view de registro que está na sua app 'noticias'
