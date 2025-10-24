@@ -1,64 +1,72 @@
-{% extends "noticias/base.html" %} {% block content %} <div class="text-center">
-    
-    <h2 class="display-5 fw-bold">Olá, {{ user.username }}!</h2>
-    
-    <p class="lead mb-4">Acompanhe seu hábito de leitura diária.</p>
+{% extends "base.html" %}
 
-    <div class="rounded p-4 mb-4" style="background-color: #f0f0ff;">
-        <h4 class="fw-normal">Sua sequência de leitura atual é:</h4>
-        <span class="display-3 fw-bold text-primary">
-            <i class="bi bi-fire text-danger"></i>
-            {{ user.perfil.leitura_streak }} dia(s)
-        </span>
-    </div>
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    
+    <!-- Seção de Streak e Check-in (SÓ APARECE SE O USUÁRIO ESTIVER LOGADO) -->
+    {% if user.is_authenticated %}
+        <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6 mb-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Seu Progresso</h2>
+            
+            <!-- Verifica se o objeto 'perfil' existe (ele é enviado pela view) -->
+            {% if perfil %}
+                <p class="text-lg text-gray-600">
+                    Seu streak de leitura atual é de: 
+                    <span class="font-bold text-4xl text-indigo-600">{{ perfil.leitura_streak }}</span> 
+                    dia(s)!
+                </p>
+            {% else %}
+                <p class="text-lg text-red-600">Não foi possível carregar seu perfil.</p>
+            {% endif %}
 
-    {% if ja_fez_checkin_hoje %}
-        <p class="fs-5 text-success fw-bold">
-            <i class="bi bi-calendar-check-fill"></i>
-            Você já fez seu check-in hoje. Volte amanhã!
-        </p>
+            <!-- Botão de Check-in -->
+            {% if not ja_fez_checkin_hoje %}
+                <p class="mt-4 text-gray-500">Você ainda não fez seu check-in de leitura hoje.</p>
+                <!-- NOTA: Este formulário assume que você tem uma notícia para linkar. 
+                     Para simplificar, vamos apenas mostrar a mensagem. 
+                     Você precisará de uma lógica para saber QUAL notícia usar para o check-in.
+                     Por enquanto, a lógica de check-in está na view 'check_news_view' 
+                -->
+            {% else %}
+                <p class="mt-4 font-semibold text-green-600">Você já fez seu check-in de hoje! 🎉</p>
+            {% endif %}
+        </div>
     {% else %}
-        <p class="fs-5 text-muted">Você ainda não fez seu check-in hoje.</p>
-    {% endif %}
-
-    <hr class="my-4">
-
-    <h4 class="mb-3">Notícias de Hoje</h4>
-    {% for noticia in noticias %}
-        <div class="card mb-2 text-start">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="card-title mb-1">{{ noticia.titulo }}</h5>
-                    <small class="text-muted">Interesse: {{ noticia.interest.name|default:"Geral" }}</small>
-                </div>
-                <div class="ms-2">
-                    <a href="{{ noticia.link }}" target="_blank" class="btn btn-secondary btn-sm" title="Ler Notícia">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                    </a>
-                    
-                    {% if not ja_fez_checkin_hoje %}
-                    <form action="{% url 'check_news' noticia.id %}" method="POST" style="display: inline;" title="Marcar como lida">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success btn-sm">
-                            <i class="bi bi-check-lg"></i>
-                        </button>
-                    </form>
-                    {% endif %}
-                </div>
+        <!-- Mensagem para usuários deslogados -->
+        <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-8 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Bem-vindo ao MeuJornal</h2>
+            <p class="text-lg text-gray-600 mb-6">
+                Faça login ou crie uma conta para começar a acompanhar seu streak de leitura e organizar suas metas.
+            </p>
+            <div>
+                <a href="{% url 'login' %}" class="px-6 py-3 rounded-lg text-lg font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 mr-4">
+                    Entrar
+                </a>
+                <a href="{% url 'registro' %}" class="px-6 py-3 rounded-lg text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                    Cadastrar
+                </a>
             </div>
         </div>
-    {% empty %}
-        <p class="text-muted">Nenhuma notícia encontrada.</p>
-    {% endfor %}
+    {% endif %}
+
+    <!-- Lista de Notícias (PÚBLICA) -->
+    <div class="mt-10">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Últimas Notícias</h3>
+        <div class="space-y-4">
+            {% for noticia in noticias %}
+                <div class="bg-white shadow rounded-lg p-4 border border-gray-100">
+                    <h4 class="text-lg font-semibold text-gray-800">{{ noticia.titulo }}</h4>
+                    <p class="text-gray-600">{{ noticia.resumo|truncatewords:30 }}</p>
+                    <!-- Link para a view de check-in (só funciona se logado) -->
+                    <a href="{% url 'check_news' noticia.id %}" class="text-indigo-600 hover:text-indigo-800 font-medium">
+                        Ler e fazer Check-in &rarr;
+                    </a>
+                </div>
+            {% empty %}
+                <p class="text-gray-500">Nenhuma notícia disponível no momento.</p>
+            {% endfor %}
+        </div>
+    </div>
 
 </div>
-
-{% endblock %} ```
-
-### E agora?
-
-Depois de **salvar** o arquivo `streak.html` com este novo código, volte para o seu navegador e **atualize** a página:
-
-`http://127.0.0.1:8000/`
-
-O menu com os botões "Streak", "Interesses" e "Rotina" VAI aparecer no topo.
+{% endblock content %}
