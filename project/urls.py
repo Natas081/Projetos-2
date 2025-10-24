@@ -1,13 +1,14 @@
 from django.contrib import admin
 from django.urls import path, include
-from noticias.views import registro_usuario # Importa a view de registro personalizada
+# CORREÇÃO CRÍTICA: Esta linha importa a view que faltava!
+from noticias.views import registro_usuario 
 
 urlpatterns = [
     # Rota para o painel de administração
     path('admin/', admin.site.urls),
     
     # Rota personalizada para o REGISTRO de usuário
-    # ESSENCIAL: Mapeia o /accounts/registro/ para a sua view
+    # Ela usa a view personalizada que você criou (e corrigiu no views.py)
     path('accounts/registro/', registro_usuario, name='registro'),
     
     # Rota Padrão de Autenticação do Django
