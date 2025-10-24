@@ -20,3 +20,5 @@ Repositório para o projeto.
 * Implementação da segunda história: **Rotina de Interesses e Metas**.
 * Criação da funcionalidade de **Cadastro de Interesses**.
 * Correção do ambiente virtual (`venv`) e deploy no Render.
+Render
+* https://meujornal.onrender.com/
