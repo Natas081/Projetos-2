@@ -23,39 +23,25 @@
     {% if goals %}
         <ul class="space-y-4">
             {% for goal in goals %}
-                <li class="relative p-4 rounded-lg shadow-sm flex justify-between items-center transition
-                    {% if goal.currentProgress >= goal.targetFrequency %}
-                        bg-green-100 animate-bounce
-                    {% else %}
-                        bg-indigo-50
-                    {% endif %}
-                ">
+                <li class="bg-indigo-50 p-4 rounded-lg shadow-sm flex justify-between items-center">
                     <div>
                         <p class="font-medium text-indigo-700">{{ goal.interest.name }}</p>
                         <p class="text-gray-600 text-sm">
                             Progresso: {{ goal.currentProgress }} / {{ goal.targetFrequency }} leituras
                         </p>
                     </div>
-                    {% if goal.currentProgress >= goal.targetFrequency %}
-                        <span class="text-green-600 font-semibold">✅ Meta atingida</span>
-
-                        <!-- Confete simples -->
-                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 pointer-events-none">
-                            <span class="confetti">🎉</span>
-                            <span class="confetti">🎊</span>
-                            <span class="confetti">✨</span>
-                        </div>
-
-                    {% else %}
-                        <form method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                    <form method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                        {% if goal.currentProgress < goal.targetFrequency %}
                             <button type="submit"
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition">
-                                ✅ Concluir leitura
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg font-medium transition">
+                                Marcar leitura ✅
                             </button>
-                        </form>
-                    {% endif %}
+                        {% else %}
+                            <span class="text-green-600 font-semibold" data-confetti="true">Meta atingida</span>
+                        {% endif %}
+                    </form>
                 </li>
             {% endfor %}
         </ul>
@@ -65,21 +51,39 @@
 
 </div>
 
-<!-- CSS para confete -->
-<style>
-.confetti {
-    position: absolute;
-    font-size: 1.5rem;
-    animation: confetti-fall 1.5s ease-out infinite;
-}
+<!-- Canvas para confetes -->
+<canvas id="confetti-canvas" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none;"></canvas>
 
-.confetti:nth-child(1) { left: 10%; animation-delay: 0s; }
-.confetti:nth-child(2) { left: 50%; animation-delay: 0.3s; }
-.confetti:nth-child(3) { left: 80%; animation-delay: 0.6s; }
+{% endblock %}
 
-@keyframes confetti-fall {
-    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(50px) rotate(360deg); opacity: 0; }
-}
-</style>
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const elements = document.querySelectorAll('[data-confetti="true"]');
+    if(elements.length > 0){
+        const duration = 2 * 1000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 }
+            });
+            confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 }
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+    }
+});
+</script>
 {% endblock %}

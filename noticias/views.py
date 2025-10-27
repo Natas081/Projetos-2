@@ -58,6 +58,8 @@ def registro_usuario(request):
             messages.success(request, f'Conta criada com sucesso para {user.username}!')
             login(request, user)
             return redirect('home')
+        else:
+            messages.error(request, 'Erro ao cadastrar. Verifique os campos e a senha.')
     else:
         form = UserCreationForm()
     return render(request, 'noticias/registration/registro.html', {'form': form})

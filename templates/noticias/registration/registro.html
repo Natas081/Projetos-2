@@ -3,9 +3,7 @@
 
 <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
     <!-- Título -->
-    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
-        Criar Conta
-    </h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Criar Conta</h1>
 
     <!-- Exibe mensagens de sucesso ou erro -->
     {% if messages %}
@@ -34,6 +32,9 @@
             <input type="password" name="password1" id="id_password1" required
                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                    placeholder="Digite sua senha">
+            <p class="text-sm text-gray-500 mt-1">
+                A senha deve ter pelo menos 8 caracteres, conter letras maiúsculas, minúsculas e números.
+            </p>
         </div>
 
         <!-- Campo de confirmação de senha -->
