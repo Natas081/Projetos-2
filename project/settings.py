@@ -9,16 +9,14 @@ import dj_database_url
 # -------------------- DIRETÓRIO BASE --------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # -------------------- CHAVE SECRETA --------------------
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-41sq)-djgpt%*ggw(c!a4+f7kfenhv90uyp3-f2tdvdgqrz=m!')
-
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-41sq)-djgpt%*ggw(c!a4+f7kfenhv90uyp3-f2tdvdgqrz=m!'
+)
 
 # -------------------- DEBUG --------------------
-# Quando estiver rodando localmente: DEBUG = True
-# No Render: automaticamente desativa
 DEBUG = 'RENDER' not in os.environ
-
 
 # -------------------- HOSTS PERMITIDOS --------------------
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
@@ -27,7 +25,6 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
     ALLOWED_HOSTS.append('.onrender.com')
-
 
 # -------------------- APLICAÇÕES INSTALADAS --------------------
 INSTALLED_APPS = [
@@ -38,13 +35,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Sua app principal
+    # App principal
     'noticias',
 
     # Suporte a arquivos estáticos no Render
     'whitenoise.runserver_nostatic',
 ]
-
 
 # -------------------- MIDDLEWARE --------------------
 MIDDLEWARE = [
@@ -58,29 +54,33 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 # -------------------- URLS E TEMPLATES --------------------
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+
         # Diretório principal de templates
         'DIRS': [BASE_DIR / 'templates'],
+
         'APP_DIRS': True,
+
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # ✅ Context processor do streak
+                'noticias.context_processors.streak_processor',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'project.wsgi.application'
-
 
 # -------------------- BANCO DE DADOS --------------------
 DATABASES = {
@@ -97,7 +97,6 @@ if 'DATABASE_URL' in os.environ:
         ssl_require=True
     )
 
-
 # -------------------- VALIDAÇÃO DE SENHA --------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -106,28 +105,21 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
 # -------------------- IDIOMA E FUSO HORÁRIO --------------------
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-
 # -------------------- ARQUIVOS ESTÁTICOS --------------------
 STATIC_URL = 'static/'
-
-# Pasta de saída de arquivos estáticos (Render usa esta)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
 # -------------------- CONFIGURAÇÕES DE LOGIN --------------------
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-
+LOGIN_URL = 'login'              # nome da URL de login
+LOGIN_REDIRECT_URL = 'home'      # redireciona para home após login
+LOGOUT_REDIRECT_URL = 'home'     # redireciona para home após logout
 
 # -------------------- CHAVE PADRÃO DE PK --------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

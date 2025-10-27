@@ -1,49 +1,125 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, logout
 from django.contrib import messages
+from datetime import date, timedelta
+from .models import Interest, Noticia, Perfil, CheckIn, Goal
 
-# REGISTRO
+# -----------------------------
+# PÁGINAS PRINCIPAIS
+# -----------------------------
+def home(request):
+    noticias = Noticia.objects.all().order_by('-id')[:5]
+    contexto = {"noticias": noticias}
+    return render(request, 'noticias/home.html', contexto)
+
+def routine_view(request):
+    return render(request, 'noticias/routine.html')
+
+# -----------------------------
+# AUTENTICAÇÃO
+# -----------------------------
 def registro_usuario(request):
-    """
-    Exibe o formulário de registro de novo usuário e salva no banco de dados.
-    """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Conta criada com sucesso para {username}!')
-            login(request, user)  # opcional: loga o usuário automaticamente
+            messages.success(request, f'Conta criada com sucesso para {user.username}!')
+            login(request, user)
             return redirect('home')
     else:
         form = UserCreationForm()
-    return render(request, 'registration/registro.html', {'form': form})
+    return render(request, 'noticias/registration/registro.html', {'form': form})
 
-
-# LOGIN
 def login_usuario(request):
-    """
-    Tela de login.
-    """
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
             login(request, user)
-            messages.success(request, f'Bem-vindo, {username}!')
+            messages.success(request, f'Bem-vindo, {user.username}!')
             return redirect('home')
         else:
             messages.error(request, 'Usuário ou senha incorretos.')
-    return render(request, 'registration/login.html')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'noticias/registration/login.html', {'form': form})
 
-
-# LOGOUT
 def logout_usuario(request):
-    """
-    Desloga o usuário.
-    """
     logout(request)
     messages.info(request, 'Você saiu da conta.')
     return redirect('login')
+
+# -----------------------------
+# INTERESSES
+# -----------------------------
+def gerenciar_interesses(request):
+    if not request.user.is_authenticated:
+        messages.error(request, 'Você precisa estar logado para gerenciar interesses.')
+        return redirect('login')
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        target_frequency = request.POST.get('target_frequency')  # quantidade de leituras por semana
+
+        if name:
+            interest, created = Interest.objects.get_or_create(user=request.user, name=name)
+            messages.success(request, f'Interesse "{name}" adicionado!')
+
+            # Cria meta semanal se o usuário informou frequência válida
+            if target_frequency and target_frequency.isdigit():
+                week_start = Goal.get_start_of_week()
+                Goal.objects.create(
+                    user=request.user,
+                    interest=interest,
+                    targetFrequency=int(target_frequency),
+                    currentProgress=0,
+                    weekStartDate=week_start
+                )
+                messages.success(request, f'Meta semanal criada: {target_frequency} leituras.')
+
+            return redirect('pagina_de_interesses')
+
+    interests_list = Interest.objects.filter(user=request.user).order_by('name')
+    return render(request, 'noticias/interesses.html', {'interests': interests_list})
+
+def delete_interest_view(request, interest_id):
+    if request.method == 'POST' and request.user.is_authenticated:
+        try:
+            interest = Interest.objects.get(id=interest_id, user=request.user)
+            interest.delete()
+            messages.success(request, 'Interesse deletado!')
+        except Interest.DoesNotExist:
+            messages.error(request, 'Interesse não encontrado.')
+    return redirect('pagina_de_interesses')
+
+# -----------------------------
+# STREAK
+# -----------------------------
+def streak_page(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "Você precisa estar logado para acessar sua sequência.")
+        return redirect('login')
+
+    perfil = request.user.perfil
+    hoje = date.today()
+    ontem = hoje - timedelta(days=1)
+
+    # Verifica se o check-in de hoje já foi feito
+    ja_fez = CheckIn.objects.filter(usuario=request.user, data_checkin=hoje).exists()
+
+    if request.method == 'POST' and not ja_fez:
+        CheckIn.objects.create(usuario=request.user)
+        if perfil.ultima_leitura == ontem:
+            perfil.leitura_streak += 1
+        else:
+            perfil.leitura_streak = 1
+        perfil.ultima_leitura = hoje
+        perfil.save()
+        messages.success(request, "Check-in confirmado com sucesso! 🔥")
+        return redirect('streak')
+
+    return render(request, 'noticias/streak.html', {
+        "perfil": perfil,
+        "ja_fez_checkin_hoje": ja_fez
+    })

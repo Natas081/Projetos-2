@@ -1,0 +1,88 @@
+{% extends "noticias/base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+
+    <!-- Seção de Streak e Check-in -->
+    {% if user.is_authenticated %}
+        <div class="bg-white shadow-xl rounded-2xl border border-gray-200 p-8 mb-10 text-center">
+            <h2 class="text-3xl font-extrabold text-gray-800 mb-3 flex items-center justify-center gap-2">
+                🔥 Seu Progresso de Leitura
+            </h2>
+
+            {% if perfil %}
+                <p class="text-lg text-gray-600 mb-4">
+                    Você está com um streak de leitura de:
+                </p>
+                <p class="text-5xl font-extrabold text-indigo-600 mb-4 drop-shadow-sm">
+                    {{ perfil.leitura_streak }} <span class="text-gray-700 text-2xl">dia(s)</span>
+                </p>
+
+                {% if not ja_fez_checkin_hoje %}
+                    <p class="text-gray-500 mb-6">Você ainda não fez o check-in de leitura hoje.</p>
+                    <a href="{% url 'streak' %}"
+                       class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition transform hover:scale-[1.02]">
+                       ✅ Fazer Check-in Agora
+                    </a>
+                {% else %}
+                    <p class="mt-2 text-green-600 font-semibold text-lg">Você já fez seu check-in de hoje! 🎉</p>
+                {% endif %}
+            {% else %}
+                <p class="text-lg text-red-600">Não foi possível carregar seu perfil.</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <!-- Mensagem para visitantes -->
+        <div class="bg-white shadow-xl rounded-2xl border border-gray-200 p-10 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Bem-vindo ao <span class="text-indigo-600">MeuJornal</span> 📰</h2>
+            <p class="text-lg text-gray-600 mb-6">
+                Faça login ou crie uma conta para acompanhar seu progresso de leitura e manter seu streak diário.
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="{% url 'login' %}"
+                   class="px-6 py-3 rounded-lg text-lg font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition">
+                   Entrar
+                </a>
+                <a href="{% url 'registro' %}"
+                   class="px-6 py-3 rounded-lg text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition">
+                   Cadastrar
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Lista de Notícias -->
+    <div class="mt-12">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            🗞️ Últimas Notícias
+        </h3>
+
+        {% if noticias %}
+            <div class="grid md:grid-cols-2 gap-6">
+                {% for noticia in noticias %}
+                    <div class="bg-white shadow-lg rounded-xl border border-gray-100 p-6 flex flex-col justify-between transition transform hover:scale-[1.01] hover:shadow-xl">
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-800 mb-2">{{ noticia.titulo }}</h4>
+                            <p class="text-gray-600 mb-4">{{ noticia.resumo|truncatewords:25 }}</p>
+                        </div>
+
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'streak' %}"
+                               class="mt-auto text-indigo-600 hover:text-indigo-800 font-medium">
+                                Ler e fazer Check-in &rarr;
+                            </a>
+                        {% else %}
+                            <a href="{% url 'login' %}"
+                               class="mt-auto text-indigo-600 hover:text-indigo-800 font-medium">
+                                Fazer login para ler →
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-gray-500">Nenhuma notícia disponível no momento.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

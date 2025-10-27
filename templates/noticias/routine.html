@@ -1,79 +1,86 @@
 {% extends "noticias/base.html" %}
-
 {% block content %}
 
-<h2 class="text-center mb-4">
-    <i class="bi bi-calendar-check-fill text-primary"></i>
-    Rotina de Interesses
-</h2>
+<div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+    <h2 class="text-center text-3xl font-bold mb-6 text-gray-800">
+        <span class="inline-flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3M16 7V3M4 11h16M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Rotina de Interesses
+        </span>
+    </h2>
 
-{% if not has_interests %}
-    <div class="alert alert-warning text-center">
-      <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Ops!</h4>
-      <p>Você precisa adicionar interesses antes de criar metas.</p>
-    </div>
-    <div class="d-grid gap-2">
-        <a href="{% url 'pagina_de_interesses' %}" class="btn btn-primary btn-lg">
-            <i class="bi bi-plus-circle-fill"></i> Adicionar Interesses
-        </a>
-    </div>
+    {% if not has_interests %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-5 rounded-lg mb-6 text-center">
+            <h3 class="text-lg font-semibold mb-2">⚠️ Ops!</h3>
+            <p>Você precisa adicionar interesses antes de criar metas.</p>
+            <a href="{% url 'pagina_de_interesses' %}"
+               class="mt-4 inline-block bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">
+               ➕ Adicionar Interesses
+            </a>
+        </div>
 
-{% else %}
-    
-    <h3 class="h4">Minhas Metas Semanais</h3>
-    {% if goals_list %}
-        <ul class="list-group list-group-flush mb-3">
-            {% for goal in goals_list %}
-                <li class="list-group-item d-flex justify-content-between align-items-center fs-5">
-                    <strong>{{ goal.interest.name }}</strong>
-                    <span class="badge 
-                        {% if goal.currentProgress >= goal.targetFrequency %}
-                            bg-success
-                        {% else %}
-                            bg-primary
-                        {% endif %}
-                        rounded-pill fs-6">
-                        {{ goal.currentProgress }} / {{ goal.targetFrequency }}
-                    </span>
-                </li>
-            {% endfor %}
-        </ul>
     {% else %}
-        <p class="text-muted text-center">Você ainda não definiu metas para esta semana.</p>
-    {% endif %}
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Minhas Metas Semanais</h3>
 
-    <hr class="my-4">
+        {% if goals_list %}
+            <ul class="space-y-3 mb-6">
+                {% for goal in goals_list %}
+                    <li class="flex justify-between items-center bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition">
+                        <span class="font-medium text-gray-800">{{ goal.interest.name }}</span>
+                        <span class="px-4 py-1 text-sm rounded-full 
+                            {% if goal.currentProgress >= goal.targetFrequency %}
+                                bg-green-100 text-green-800
+                            {% else %}
+                                bg-indigo-100 text-indigo-800
+                            {% endif %}">
+                            {{ goal.currentProgress }} / {{ goal.targetFrequency }}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600 text-center mb-6">Você ainda não definiu metas para esta semana.</p>
+        {% endif %}
 
-    <h3 class="h4">Definir Nova Meta</h3>
-    <form method="POST" action="{% url 'routine' %}">
-        {% csrf_token %}
-        
-        <div class="mb-3">
-          <label for="interest_id" class="form-label"><strong>Interesse:</strong></label>
-          <select class="form-select form-select-lg" name="interest_id" id="interest_id" required>
-              <option value="" disabled selected>Selecione um interesse</option>
-              {% for interest in interests_list %}
-                  <option value="{{ interest.id }}">{{ interest.name }}</option>
-              {% endfor %}
-          </select>
-        </div>
+        <hr class="my-8">
 
-        <div class="mb-3">
-          <label for="frequency" class="form-label"><strong>Vezes por semana:</strong></label>
-          <input type="number" class="form-control form-control-lg" name="frequency" id="frequency" min="1" value="1" required>
-        </div>
-        
-        <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-success btn-lg">
-                <i class="bi bi-check-lg"></i> Salvar Meta
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Definir Nova Meta</h3>
+        <form method="POST" action="{% url 'routine' %}" class="space-y-5">
+            {% csrf_token %}
+            
+            <div>
+                <label for="interest_id" class="block text-gray-700 font-medium mb-2">Interesse:</label>
+                <select name="interest_id" id="interest_id" required
+                        class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="" disabled selected>Selecione um interesse</option>
+                    {% for interest in interests_list %}
+                        <option value="{{ interest.id }}">{{ interest.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="frequency" class="block text-gray-700 font-medium mb-2">Vezes por semana:</label>
+                <input type="number" id="frequency" name="frequency" min="1" value="1" required
+                       class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition transform hover:scale-[1.02]">
+                ✅ Salvar Meta
             </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <a href="{% url 'pagina_de_interesses' %}"
+               class="inline-block border border-gray-300 text-gray-700 px-5 py-2 rounded-lg font-medium hover:bg-gray-100 transition">
+               🌟 Gerenciar Interesses
+            </a>
         </div>
-    </form>
+    {% endif %}
+</div>
 
-    <div class="text-center mt-4">
-        <a href="{% url 'pagina_de_interesses' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-bookmark-star"></i> Gerenciar Interesses
-        </a>
-    </div>
-
-{% endif %} {% endblock %}
+{% endblock %}

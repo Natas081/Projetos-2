@@ -1,72 +1,33 @@
-{% extends "base.html" %}
+{% extends "noticias/base.html" %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
-    
-    <!-- Seção de Streak e Check-in (SÓ APARECE SE O USUÁRIO ESTIVER LOGADO) -->
-    {% if user.is_authenticated %}
-        <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-6 mb-8 text-center">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Seu Progresso</h2>
-            
-            <!-- Verifica se o objeto 'perfil' existe (ele é enviado pela view) -->
-            {% if perfil %}
-                <p class="text-lg text-gray-600">
-                    Seu streak de leitura atual é de: 
-                    <span class="font-bold text-4xl text-indigo-600">{{ perfil.leitura_streak }}</span> 
-                    dia(s)!
-                </p>
-            {% else %}
-                <p class="text-lg text-red-600">Não foi possível carregar seu perfil.</p>
-            {% endif %}
+<div class="max-w-md mx-auto mt-10 bg-white shadow-xl rounded-2xl border border-gray-200 p-8 text-center">
 
-            <!-- Botão de Check-in -->
-            {% if not ja_fez_checkin_hoje %}
-                <p class="mt-4 text-gray-500">Você ainda não fez seu check-in de leitura hoje.</p>
-                <!-- NOTA: Este formulário assume que você tem uma notícia para linkar. 
-                     Para simplificar, vamos apenas mostrar a mensagem. 
-                     Você precisará de uma lógica para saber QUAL notícia usar para o check-in.
-                     Por enquanto, a lógica de check-in está na view 'check_news_view' 
-                -->
-            {% else %}
-                <p class="mt-4 font-semibold text-green-600">Você já fez seu check-in de hoje! 🎉</p>
-            {% endif %}
-        </div>
-    {% else %}
-        <!-- Mensagem para usuários deslogados -->
-        <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-8 text-center">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Bem-vindo ao MeuJornal</h2>
-            <p class="text-lg text-gray-600 mb-6">
-                Faça login ou crie uma conta para começar a acompanhar seu streak de leitura e organizar suas metas.
-            </p>
-            <div>
-                <a href="{% url 'login' %}" class="px-6 py-3 rounded-lg text-lg font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 mr-4">
-                    Entrar
-                </a>
-                <a href="{% url 'registro' %}" class="px-6 py-3 rounded-lg text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700">
-                    Cadastrar
-                </a>
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">🔥 Seu Streak de Leitura</h1>
+
+    <p class="text-lg text-gray-600 mb-6">
+        Dias consecutivos de acesso: 
+        <span class="text-4xl font-extrabold text-indigo-600">{{ perfil.leitura_streak }}</span>
+    </p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="bg-green-100 text-green-800 border border-green-300 rounded-lg px-4 py-3 mb-4">
+                {{ message }}
             </div>
-        </div>
+        {% endfor %}
     {% endif %}
 
-    <!-- Lista de Notícias (PÚBLICA) -->
-    <div class="mt-10">
-        <h3 class="text-2xl font-bold text-gray-900 mb-4">Últimas Notícias</h3>
-        <div class="space-y-4">
-            {% for noticia in noticias %}
-                <div class="bg-white shadow rounded-lg p-4 border border-gray-100">
-                    <h4 class="text-lg font-semibold text-gray-800">{{ noticia.titulo }}</h4>
-                    <p class="text-gray-600">{{ noticia.resumo|truncatewords:30 }}</p>
-                    <!-- Link para a view de check-in (só funciona se logado) -->
-                    <a href="{% url 'check_news' noticia.id %}" class="text-indigo-600 hover:text-indigo-800 font-medium">
-                        Ler e fazer Check-in &rarr;
-                    </a>
-                </div>
-            {% empty %}
-                <p class="text-gray-500">Nenhuma notícia disponível no momento.</p>
-            {% endfor %}
-        </div>
-    </div>
+    {% if not ja_fez_checkin_hoje %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                ✅ Confirmar acesso de hoje
+            </button>
+        </form>
+    {% else %}
+        <p class="text-green-600 font-semibold mt-4">Você já confirmou o acesso hoje! 🎉</p>
+    {% endif %}
 
 </div>
-{% endblock content %}
+{% endblock %}
