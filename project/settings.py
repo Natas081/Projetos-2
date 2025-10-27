@@ -1,41 +1,35 @@
 """
 Django settings for project project.
-...
 """
 
 from pathlib import Path
 import os
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# -------------------- DIRETÓRIO BASE --------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# -------------------- SECRET KEY --------------------
+# -------------------- CHAVE SECRETA --------------------
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-41sq)-djgpt%*ggw(c!a4+f7kfenhv90uyp3-f2tdvdgqrz=m!')
-# ----------------------------------------------------
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG MODIFICADO (desliga automaticamente no Render)
+# -------------------- DEBUG --------------------
+# Quando estiver rodando localmente: DEBUG = True
+# No Render: automaticamente desativa
 DEBUG = 'RENDER' not in os.environ
 
-# -------------------- ALLOWED_HOSTS --------------------
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] # Hosts locais
+
+# -------------------- HOSTS PERMITIDOS --------------------
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-    # Adiciona o subdomínio genérico do Render para maior compatibilidade
     ALLOWED_HOSTS.append('.onrender.com')
-# -------------------------------------------------------
 
 
-# Application definition
-
+# -------------------- APLICAÇÕES INSTALADAS --------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,11 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Sua app principal
     'noticias',
-    # Adiciona whitenoise para servir arquivos estáticos em dev (boa prática)
-    'whitenoise.runserver_nostatic', 
+
+    # Suporte a arquivos estáticos no Render
+    'whitenoise.runserver_nostatic',
 ]
 
+
+# -------------------- MIDDLEWARE --------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -59,13 +58,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+# -------------------- URLS E TEMPLATES --------------------
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # CORREÇÃO: Usando a sintaxe Pathlib (BASE_DIR / 'templates') para compatibilidade no Render
-        'DIRS': [BASE_DIR / 'templates'], 
+        # Diretório principal de templates
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,7 +82,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
-# Database
+# -------------------- BANCO DE DADOS --------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -89,6 +90,7 @@ DATABASES = {
     }
 }
 
+# Render usa variável DATABASE_URL
 if 'DATABASE_URL' in os.environ:
     DATABASES['default'] = dj_database_url.config(
         conn_max_age=600,
@@ -96,54 +98,36 @@ if 'DATABASE_URL' in os.environ:
     )
 
 
-# Password validation
+# -------------------- VALIDAÇÃO DE SENHA --------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', # CORRIGIDO: String completa
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
-# Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+# -------------------- IDIOMA E FUSO HORÁRIO --------------------
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/' 
+# -------------------- ARQUIVOS ESTÁTICOS --------------------
+STATIC_URL = 'static/'
 
-# --- CORREÇÃO FINAL ---
-# A linha abaixo estava causando o erro 500 no Render porque a pasta 'static' não existe.
-# Comentamos ela para resolver o aviso W004.
-# STATICFILES_DIRS = [ 
-#     os.path.join(BASE_DIR, 'static'),
-# ]
-# ----------------------
-
+# Pasta de saída de arquivos estáticos (Render usa esta)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Configurações de Autenticação
-# Django buscará a página de login em /accounts/login/
-LOGIN_URL = '/accounts/login/' 
-# Redireciona para a home ('/') após o login bem-sucedido
+# -------------------- CONFIGURAÇÕES DE LOGIN --------------------
+LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
-# Redireciona para a home ('/') após o logout
 LOGOUT_REDIRECT_URL = '/'
 
+
+# -------------------- CHAVE PADRÃO DE PK --------------------
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
