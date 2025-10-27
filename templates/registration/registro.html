@@ -1,43 +1,38 @@
 <!--
-Este template é o formulário de Login de usuário.
-Ele usa a variável 'form' enviada pelo sistema de autenticação do Django.
+Este template é o formulário de Registro de usuário.
+Ele usa o formulário 'UserCreationForm' (ou personalizado) passado pela view.
 -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login de Usuário</title>
-    <!-- Inclui o Tailwind CSS para estilização -->
+    <title>Cadastro de Usuário</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilos adicionais para centralizar e melhorar a leitura */
         body { font-family: 'Inter', sans-serif; background-color: #f7fafc; }
-        
-        /* Ajuste do estilo para os campos de formulário gerados pelo Django */
         .form-container p { margin-bottom: 1rem; }
         .form-container label { display: block; font-weight: 600; color: #4a5568; margin-bottom: 0.25rem; }
         .form-container input[type="text"],
+        .form-container input[type="email"],
         .form-container input[type="password"] {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid #e2e8f0;
-            border-radius: 0.5rem; /* rounded-lg */
+            border-radius: 0.5rem;
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
             margin-top: 0.25rem;
         }
-        .form-container input[type="text"]:focus,
-        .form-container input[type="password"]:focus {
-            border-color: #4c51bf; /* indigo-600 */
+        .form-container input:focus {
+            border-color: #4c51bf;
             box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.5);
             outline: none;
         }
-        /* Estilo para erros de validação */
         .form-container ul.errorlist {
             list-style: none;
             padding: 0;
             margin-top: 0.5rem;
-            color: #e53e3e; /* red-600 */
+            color: #e53e3e;
             font-size: 0.875rem;
             font-weight: 500;
         }
@@ -46,55 +41,35 @@ Ele usa a variável 'form' enviada pelo sistema de autenticação do Django.
 <body class="flex items-center justify-center min-h-screen p-4">
     <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
         
-        <!-- Título -->
         <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center border-b pb-3">
-            Acesso à Conta
+            Criar Conta
         </h1>
 
-        <!-- Tratamento de Erros de Login (se houver) -->
         {% if form.errors %}
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <strong class="font-bold">Erro de Login!</strong>
-                <span class="block sm:inline">Nome de usuário ou senha inválidos.</span>
+                <strong class="font-bold">Erro no cadastro!</strong>
+                <span class="block sm:inline">Verifique os campos e tente novamente.</span>
             </div>
         {% endif %}
-        
-        <!-- Formulário de Login -->
-        <!-- O action aponta para a URL de login (que está em /accounts/login/) -->
-        <form method="post" action="{% url 'login' %}" class="space-y-6 form-container">
+
+        <form method="post" action="{% url 'noticias:registro' %}" class="space-y-6 form-container">
             {% csrf_token %}
-            
-            <!-- Renderiza os campos do formulário (username e password) -->
             {{ form.as_p }}
-
-            <!-- Campo Hidden para Redirecionamento (importante para segurança) -->
-            <!-- Garante que o usuário volte para a página onde estava (se houver) ou para a definida em settings.py -->
-            <input type="hidden" name="next" value="{{ next }}" />
-
-            <!-- Botão de Submissão -->
             <button type="submit"
-                class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50"
+                class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01] focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50"
             >
-                Entrar
+                Cadastrar
             </button>
         </form>
 
-        <!-- Links Auxiliares -->
         <div class="mt-6 text-center border-t pt-4 space-y-3">
             <p class="text-sm text-gray-600">
-                <a href="{% url 'password_reset' %}" class="text-indigo-600 hover:text-indigo-800 font-medium transition duration-150">
-                    Esqueceu sua senha?
-                </a>
-            </p>
-             <p class="text-sm text-gray-600">
-                Ainda não tem conta? 
-                <!-- Aponta para a URL de registro que definimos no noticias/urls.py -->
-                <a href="{% url 'noticias:registro' %}" class="text-indigo-600 hover:text-indigo-800 font-medium transition duration-150">
-                    Cadastre-se aqui
+                Já tem uma conta?
+                <a href="{% url 'login' %}" class="text-indigo-600 hover:text-indigo-800 font-medium transition duration-150">
+                    Entrar
                 </a>
             </p>
         </div>
-        
     </div>
 </body>
 </html>
