@@ -1,86 +1,85 @@
 {% extends "noticias/base.html" %}
+
 {% block content %}
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
 
-<div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-    <h2 class="text-center text-3xl font-bold mb-6 text-gray-800">
-        <span class="inline-flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 7V3M16 7V3M4 11h16M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            Rotina de Interesses
-        </span>
-    </h2>
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Rotina Semanal</h1>
 
-    {% if not has_interests %}
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-5 rounded-lg mb-6 text-center">
-            <h3 class="text-lg font-semibold mb-2">⚠️ Ops!</h3>
-            <p>Você precisa adicionar interesses antes de criar metas.</p>
-            <a href="{% url 'pagina_de_interesses' %}"
-               class="mt-4 inline-block bg-indigo-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">
-               ➕ Adicionar Interesses
-            </a>
-        </div>
-
+    {% if interests %}
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Seus Interesses</h2>
+        <ul class="space-y-3 mb-8">
+            {% for interest in interests %}
+                <li class="bg-gray-50 p-4 rounded-lg shadow-sm hover:bg-gray-100 transition">
+                    <span class="font-medium">{{ interest.name }}</span>
+                </li>
+            {% endfor %}
+        </ul>
     {% else %}
-        <h3 class="text-xl font-semibold text-gray-700 mb-4">Minhas Metas Semanais</h3>
-
-        {% if goals_list %}
-            <ul class="space-y-3 mb-6">
-                {% for goal in goals_list %}
-                    <li class="flex justify-between items-center bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition">
-                        <span class="font-medium text-gray-800">{{ goal.interest.name }}</span>
-                        <span class="px-4 py-1 text-sm rounded-full 
-                            {% if goal.currentProgress >= goal.targetFrequency %}
-                                bg-green-100 text-green-800
-                            {% else %}
-                                bg-indigo-100 text-indigo-800
-                            {% endif %}">
-                            {{ goal.currentProgress }} / {{ goal.targetFrequency }}
-                        </span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-gray-600 text-center mb-6">Você ainda não definiu metas para esta semana.</p>
-        {% endif %}
-
-        <hr class="my-8">
-
-        <h3 class="text-xl font-semibold text-gray-700 mb-4">Definir Nova Meta</h3>
-        <form method="POST" action="{% url 'routine' %}" class="space-y-5">
-            {% csrf_token %}
-            
-            <div>
-                <label for="interest_id" class="block text-gray-700 font-medium mb-2">Interesse:</label>
-                <select name="interest_id" id="interest_id" required
-                        class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="" disabled selected>Selecione um interesse</option>
-                    {% for interest in interests_list %}
-                        <option value="{{ interest.id }}">{{ interest.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div>
-                <label for="frequency" class="block text-gray-700 font-medium mb-2">Vezes por semana:</label>
-                <input type="number" id="frequency" name="frequency" min="1" value="1" required
-                       class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-
-            <button type="submit"
-                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition transform hover:scale-[1.02]">
-                ✅ Salvar Meta
-            </button>
-        </form>
-
-        <div class="text-center mt-6">
-            <a href="{% url 'pagina_de_interesses' %}"
-               class="inline-block border border-gray-300 text-gray-700 px-5 py-2 rounded-lg font-medium hover:bg-gray-100 transition">
-               🌟 Gerenciar Interesses
-            </a>
-        </div>
+        <p class="text-gray-600 mb-8 text-center">Você ainda não adicionou nenhum interesse.</p>
     {% endif %}
+
+    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Metas Semanais</h2>
+
+    {% if goals %}
+        <ul class="space-y-4">
+            {% for goal in goals %}
+                <li class="relative p-4 rounded-lg shadow-sm flex justify-between items-center transition
+                    {% if goal.currentProgress >= goal.targetFrequency %}
+                        bg-green-100 animate-bounce
+                    {% else %}
+                        bg-indigo-50
+                    {% endif %}
+                ">
+                    <div>
+                        <p class="font-medium text-indigo-700">{{ goal.interest.name }}</p>
+                        <p class="text-gray-600 text-sm">
+                            Progresso: {{ goal.currentProgress }} / {{ goal.targetFrequency }} leituras
+                        </p>
+                    </div>
+                    {% if goal.currentProgress >= goal.targetFrequency %}
+                        <span class="text-green-600 font-semibold">✅ Meta atingida</span>
+
+                        <!-- Confete simples -->
+                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 pointer-events-none">
+                            <span class="confetti">🎉</span>
+                            <span class="confetti">🎊</span>
+                            <span class="confetti">✨</span>
+                        </div>
+
+                    {% else %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                            <button type="submit"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition">
+                                ✅ Concluir leitura
+                            </button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-gray-600 text-center">Nenhuma meta semanal definida ainda.</p>
+    {% endif %}
+
 </div>
 
+<!-- CSS para confete -->
+<style>
+.confetti {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: confetti-fall 1.5s ease-out infinite;
+}
+
+.confetti:nth-child(1) { left: 10%; animation-delay: 0s; }
+.confetti:nth-child(2) { left: 50%; animation-delay: 0.3s; }
+.confetti:nth-child(3) { left: 80%; animation-delay: 0.6s; }
+
+@keyframes confetti-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(50px) rotate(360deg); opacity: 0; }
+}
+</style>
 {% endblock %}

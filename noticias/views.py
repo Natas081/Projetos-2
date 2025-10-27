@@ -10,11 +10,42 @@ from .models import Interest, Noticia, Perfil, CheckIn, Goal
 # -----------------------------
 def home(request):
     noticias = Noticia.objects.all().order_by('-id')[:5]
-    contexto = {"noticias": noticias}
-    return render(request, 'noticias/home.html', contexto)
+    return render(request, 'noticias/home.html', {"noticias": noticias})
 
+# -----------------------------
+# ROTINA DE INTERESSES COM METAS
+# -----------------------------
 def routine_view(request):
-    return render(request, 'noticias/routine.html')
+    if not request.user.is_authenticated:
+        messages.error(request, "Você precisa estar logado para acessar a rotina.")
+        return redirect('login')
+
+    # Pega interesses do usuário
+    interests = Interest.objects.filter(user=request.user).order_by('name')
+
+    # Pega metas semanais ativas
+    week_start = Goal.get_start_of_week()
+    goals = Goal.objects.filter(user=request.user, weekStartDate=week_start).select_related('interest')
+
+    # Atualiza progresso de uma meta se botão clicado
+    if request.method == 'POST':
+        goal_id = request.POST.get('goal_id')
+        try:
+            goal = Goal.objects.get(id=goal_id, user=request.user)
+            if goal.currentProgress < goal.targetFrequency:
+                goal.currentProgress += 1
+                goal.save()
+                messages.success(request, f'Progresso atualizado para "{goal.interest.name}" ({goal.currentProgress}/{goal.targetFrequency}).')
+            else:
+                messages.info(request, f'Você já completou a meta de "{goal.interest.name}" esta semana!')
+        except Goal.DoesNotExist:
+            messages.error(request, 'Meta não encontrada.')
+        return redirect('routine')  # Evita repost do formulário
+
+    return render(request, 'noticias/routine.html', {
+        'interests': interests,
+        'goals': goals
+    })
 
 # -----------------------------
 # AUTENTICAÇÃO
@@ -60,13 +91,13 @@ def gerenciar_interesses(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        target_frequency = request.POST.get('target_frequency')  # quantidade de leituras por semana
+        target_frequency = request.POST.get('target_frequency')  # leituras por semana
 
         if name:
             interest, created = Interest.objects.get_or_create(user=request.user, name=name)
             messages.success(request, f'Interesse "{name}" adicionado!')
 
-            # Cria meta semanal se o usuário informou frequência válida
+            # Cria meta semanal se informado
             if target_frequency and target_frequency.isdigit():
                 week_start = Goal.get_start_of_week()
                 Goal.objects.create(
@@ -81,7 +112,7 @@ def gerenciar_interesses(request):
             return redirect('pagina_de_interesses')
 
     interests_list = Interest.objects.filter(user=request.user).order_by('name')
-    return render(request, 'noticias/interesses.html', {'interests': interests_list})
+    return render(request, 'noticias/interesses.html', {'interests_list': interests_list})
 
 def delete_interest_view(request, interest_id):
     if request.method == 'POST' and request.user.is_authenticated:
@@ -105,7 +136,6 @@ def streak_page(request):
     hoje = date.today()
     ontem = hoje - timedelta(days=1)
 
-    # Verifica se o check-in de hoje já foi feito
     ja_fez = CheckIn.objects.filter(usuario=request.user, data_checkin=hoje).exists()
 
     if request.method == 'POST' and not ja_fez:
