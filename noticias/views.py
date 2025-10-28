@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from datetime import date, timedelta
-from .models import Interest, Noticia, Perfil, CheckIn, Goal
+from .models import Interest, Noticia, Perfil, CheckIn, Goal, DiarioEntry
 
 # -----------------------------
 # PÁGINAS PRINCIPAIS
@@ -13,6 +13,57 @@ def home(request):
     return render(request, 'noticias/home.html', {"noticias": noticias})
 
 # -----------------------------
+# DIÁRIO DO APRENDIZADO
+# -----------------------------
+def diario_view(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "Você precisa estar logado para acessar o diário.")
+        return redirect('login')
+
+    if request.method == "POST":
+        texto = request.POST.get("texto")
+        if texto.strip() != "":
+            DiarioEntry.objects.create(usuario=request.user, texto=texto)
+            messages.success(request, "Anotação salva no diário!")
+            return redirect('diario')
+        else:
+            messages.error(request, "Digite algo para salvar sua anotação.")
+
+    anotacoes = DiarioEntry.objects.filter(usuario=request.user).order_by('-data_criacao')
+    return render(request, 'noticias/diario.html', {"anotacoes": anotacoes})
+
+
+def deletar_anotacao(request, anotacao_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "Você precisa estar logado para fazer isso.")
+        return redirect('login')
+
+    anotacao = get_object_or_404(DiarioEntry, id=anotacao_id, usuario=request.user)
+    anotacao.delete()
+    messages.success(request, "Anotação removida com sucesso!")
+    return redirect('diario')
+
+
+def editar_anotacao(request, anotacao_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "Você precisa estar logado para editar suas anotações.")
+        return redirect('login')
+
+    anotacao = get_object_or_404(DiarioEntry, id=anotacao_id, usuario=request.user)
+
+    if request.method == "POST":
+        novo_texto = request.POST.get("texto")
+        if novo_texto.strip() == "":
+            messages.error(request, "A anotação não pode estar vazia.")
+        else:
+            anotacao.texto = novo_texto
+            anotacao.save()
+            messages.success(request, "Anotação atualizada com sucesso! ✅")
+            return redirect('diario')
+
+    return render(request, "noticias/editar_anotacao.html", {"anotacao": anotacao})
+
+# -----------------------------
 # ROTINA DE INTERESSES COM METAS
 # -----------------------------
 def routine_view(request):
@@ -20,14 +71,10 @@ def routine_view(request):
         messages.error(request, "Você precisa estar logado para acessar a rotina.")
         return redirect('login')
 
-    # Pega interesses do usuário
     interests = Interest.objects.filter(user=request.user).order_by('name')
-
-    # Pega metas semanais ativas
     week_start = Goal.get_start_of_week()
     goals = Goal.objects.filter(user=request.user, weekStartDate=week_start).select_related('interest')
 
-    # Atualiza progresso de uma meta se botão clicado
     if request.method == 'POST':
         goal_id = request.POST.get('goal_id')
         try:
@@ -40,7 +87,7 @@ def routine_view(request):
                 messages.info(request, f'Você já completou a meta de "{goal.interest.name}" esta semana!')
         except Goal.DoesNotExist:
             messages.error(request, 'Meta não encontrada.')
-        return redirect('routine')  # Evita repost do formulário
+        return redirect('routine')
 
     return render(request, 'noticias/routine.html', {
         'interests': interests,
@@ -64,6 +111,7 @@ def registro_usuario(request):
         form = UserCreationForm()
     return render(request, 'noticias/registration/registro.html', {'form': form})
 
+
 def login_usuario(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -77,6 +125,7 @@ def login_usuario(request):
     else:
         form = AuthenticationForm()
     return render(request, 'noticias/registration/login.html', {'form': form})
+
 
 def logout_usuario(request):
     logout(request)
@@ -93,13 +142,12 @@ def gerenciar_interesses(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        target_frequency = request.POST.get('target_frequency')  # leituras por semana
+        target_frequency = request.POST.get('target_frequency')
 
         if name:
             interest, created = Interest.objects.get_or_create(user=request.user, name=name)
             messages.success(request, f'Interesse "{name}" adicionado!')
 
-            # Cria meta semanal se informado
             if target_frequency and target_frequency.isdigit():
                 week_start = Goal.get_start_of_week()
                 Goal.objects.create(
@@ -115,6 +163,7 @@ def gerenciar_interesses(request):
 
     interests_list = Interest.objects.filter(user=request.user).order_by('name')
     return render(request, 'noticias/interesses.html', {'interests_list': interests_list})
+
 
 def delete_interest_view(request, interest_id):
     if request.method == 'POST' and request.user.is_authenticated:

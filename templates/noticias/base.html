@@ -26,6 +26,7 @@
                     {% if user.is_authenticated %}
                         <a href="{% url 'pagina_de_interesses' %}" class="nav-link">Interesses</a>
                         <a href="{% url 'routine' %}" class="nav-link">Rotina</a>
+                        <a href="{% url 'diario' %}" class="nav-link">Diário</a>  <!-- NOVO BOTÃO ADICIONADO -->
                         <form method="post" action="{% url 'logout' %}" class="inline">
                             {% csrf_token %}
                             <button type="submit" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">

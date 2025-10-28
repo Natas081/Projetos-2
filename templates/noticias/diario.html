@@ -1,0 +1,64 @@
+{% extends 'noticias/base.html' %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-100">
+
+    <h1 class="text-3xl font-bold mb-6 text-indigo-700 text-center">
+        📘 Diário do Aprendizado
+    </h1>
+
+    <!-- Formulário de escrita -->
+    <form method="post" class="mb-8">
+        {% csrf_token %}
+        <label class="block text-sm font-medium text-gray-700 mb-1">Sua reflexão de hoje:</label>
+        <textarea name="texto" rows="4" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="Escreva algo que aprendeu, percebeu ou quer lembrar no futuro..."></textarea>
+        <button class="mt-3 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm transition">
+            Salvar Anotação
+        </button>
+    </form>
+
+    <hr class="my-6">
+
+    <!-- Lista de anotações -->
+    <h2 class="text-xl font-semibold text-gray-700 mb-4">Anotações Recentes</h2>
+
+    <ul class="space-y-4">
+        {% for anot in anotacoes %}
+        <li class="border border-gray-200 bg-gray-50 hover:bg-gray-100 transition shadow-sm rounded-lg p-4">
+
+            <p class="text-gray-800 whitespace-pre-line leading-relaxed">{{ anot.texto }}</p>
+
+            <div class="flex justify-between items-center mt-3">
+                <span class="text-xs text-gray-500">
+                    ✦ {{ anot.data_criacao|date:"d/m/Y H:i" }}
+                </span>
+
+                <div class="flex gap-3">
+
+                    <!-- Botão Editar -->
+                    <a href="{% url 'editar_anotacao' anot.id %}"
+                       class="text-blue-600 hover:text-blue-800 text-sm font-medium transition">
+                        ✏️ Editar
+                    </a>
+
+                    <!-- Botão Excluir -->
+                    <form method="post" action="{% url 'delete_anotacao' anot.id %}">
+                        {% csrf_token %}
+                        <button class="text-red-600 hover:text-red-800 text-sm font-medium transition">
+                            🗑 Excluir
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+
+        </li>
+        {% empty %}
+        <p class="text-gray-500 text-center italic">Nenhuma anotação ainda. Comece escrevendo acima! ✨</p>
+        {% endfor %}
+    </ul>
+
+</div>
+
+{% endblock %}

@@ -73,3 +73,20 @@ class Goal(models.Model):
         today = date.today()
         start_of_week = today - timedelta(days=today.weekday())
         return start_of_week
+
+
+# -----------------------------------------
+# ✅ MODELO DO DIÁRIO DO APRENDIZADO
+# -----------------------------------------
+class DiarioEntry(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    texto = models.TextField()
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-data_criacao']
+        verbose_name = "Anotação do Diário"
+        verbose_name_plural = "Anotações do Diário"
+
+    def __str__(self):
+        return f'{self.usuario.username} - {self.data_criacao.strftime("%d/%m/%Y %H:%M")}'
