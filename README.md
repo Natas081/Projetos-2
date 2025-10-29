@@ -35,6 +35,7 @@ Repositório para o projeto.
 ---
 
 ##  Links Importantes 
+- https://meujornal.onrender.com/
 
 ---
 
