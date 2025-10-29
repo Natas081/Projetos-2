@@ -86,6 +86,10 @@ Repositório para o projeto.
    * Implementação de mais uma história de usuário: Diário de aprendizado. 
    
    * Criação de testes automatizados.
+
+   * Bug Tracker.
+   <img width="1896" height="612" alt="image" src="https://github.com/user-attachments/assets/1e297457-268f-45a0-bf35-eace08655f21" />
+
      
    * Acompanhamento de bugs (bugtrackers).    </details>
 
