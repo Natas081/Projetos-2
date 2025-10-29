@@ -80,4 +80,6 @@ Repositório para o projeto.
   * Render: https://meujornal.onrender.com/.
 </details>
 
+<details>   <summary>- ✅ Semana 10 </summary>      * Implementação de mais uma história de usuário.      * Criação de testes automatizados.     * Acompanhamento de bugs (bugtrackers).    </details>
+
 ---
