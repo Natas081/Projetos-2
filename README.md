@@ -29,6 +29,9 @@ Repositório para o projeto.
 - **Pablo** – [pcgar@cesar.school](mailto:pcgar@cesar.school)  
     *Engenheiro de QA – Time de Desenvolvimento*  
 
+- **Ranilton Junior** – [rasrj@cesar.school](mailto:rasrj@cesar.school)  
+    *Engenheiro de QA – Time de Desenvolvimento*  
+    
 ---
 
 ##  Links Importantes 
