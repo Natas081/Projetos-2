@@ -44,7 +44,7 @@ Repositório para o projeto.
 
 ---
 
-## 📦 Entregáveis  
+##  Entregáveis  
 <details>
   <summary>- ✅ Semana 6 </summary>
   
