@@ -3,7 +3,7 @@
 Repositório para o projeto.
 
 ---
-## Time de Desenvolvimento  
+## Time  
 
 - **Diego Volia** – [dgsx@cesar.school](mailto:dgsx@cesar.school)  
     *Engenheiro de QA – Time de Desenvolvimento*  
@@ -15,7 +15,7 @@ Repositório para o projeto.
     *Full Stack – Time de Desenvolvimento*
    
 - **Joner** – [jrgs@cesar.school](mailto:jrgs@cesar.school)  
-   * – Time de Desenvolvimento*  
+    *Product Designer – Time de experiência do usuário*  
    
 - **Guilherme Silvestre** – [lgsgs@cesar.school](mailto:lgsgs@cesar.school)  
     *DevOps – Time de Desenvolvimento*  
@@ -24,7 +24,7 @@ Repositório para o projeto.
     *Teach Lead – Time de Desenvolvimento*
    
 - **Manuella** – [msn4@cesar.school](mailto:msn4@cesar.school)  
-   * – Time de Desenvolvimento*
+    *UI/UX Designer – Time de experiência e interface*
    
 - **Pablo** – [pcgar@cesar.school](mailto:pcgar@cesar.school)  
     *Engenheiro de QA – Time de Desenvolvimento*  
