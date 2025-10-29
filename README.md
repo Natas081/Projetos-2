@@ -15,7 +15,7 @@ Repositório para o projeto.
     *Full Stack – Time de Desenvolvimento*
    
 - **Joner** – [jrgs@cesar.school](mailto:jrgs@cesar.school)  
-    *Product Designer – Time de experiência do usuário*  
+    *Product Designer – Time de Experiência do Usuário*  
    
 - **Guilherme Silvestre** – [lgsgs@cesar.school](mailto:lgsgs@cesar.school)  
     *DevOps – Time de Desenvolvimento*  
@@ -24,7 +24,7 @@ Repositório para o projeto.
     *Teach Lead – Time de Desenvolvimento*
    
 - **Manuella** – [msn4@cesar.school](mailto:msn4@cesar.school)  
-    *UI/UX Designer – Time de experiência e interface*
+    *UI/UX Designer – Time de Experiência e Interface*
    
 - **Pablo** – [pcgar@cesar.school](mailto:pcgar@cesar.school)  
     *Engenheiro de QA – Time de Desenvolvimento*  
