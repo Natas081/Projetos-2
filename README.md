@@ -3,6 +3,34 @@
 Repositório para o projeto.
 
 ---
+## Time de Desenvolvimento  
+
+- **Diego Volia** – [dgsx@cesar.school](mailto:dgsx@cesar.school)  
+   *Engenheiro de QA – Time de Desenvolvimento*  
+
+- **Felipe Espínola** – [fem@cesar.school](mailto:fem@cesar.school)  
+   *Engenheiro de QA – Time de Desenvolvimento* 
+
+- **Felipe Lemos** – [fal@cesar.school](mailto:fal@cesar.school)  
+   *Full Stack – Time de Desenvolvimento*
+   
+  - **Joner** – [jrgs@cesar.school](mailto:jrgs@cesar.school)  
+   * – Time de Desenvolvimento*  
+   
+- **Guilherme Silvestre** – [lgsgs@cesar.school](mailto:lgsgs@cesar.school)  
+   *DevOps – Time de Desenvolvimento*  
+
+- **Natan** – [nlps@cesar.school](mailto:nlps@cesar.school)  
+   *Teach Lead – Time de Desenvolvimento*
+   
+- **Manuella** – [msn4@cesar.school](mailto:msn4@cesar.school)  
+   * – Time de Desenvolvimento*
+   
+- **Pablo** – [pcgar@cesar.school](mailto:pcgar@cesar.school)  
+   *Engenheiro de QA – Time de Desenvolvimento*  
+
+---
+
 
 ## Histórias de Usuário
 
