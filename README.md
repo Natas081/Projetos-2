@@ -82,7 +82,7 @@ Repositório para o projeto.
 
 <details>   <summary>- ✅ Semana 10 </summary>      
    
-   * Implementação de mais uma história de usuário. 
+   * Implementação de mais uma história de usuário: Diário de aprendizado. 
    
    * Criação de testes automatizados.
      
