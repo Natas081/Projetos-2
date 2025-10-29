@@ -14,7 +14,7 @@ Repositório para o projeto.
 - **Felipe Lemos** – [fal@cesar.school](mailto:fal@cesar.school)  
    *Full Stack – Time de Desenvolvimento*
    
-  - **Joner** – [jrgs@cesar.school](mailto:jrgs@cesar.school)  
+- **Joner** – [jrgs@cesar.school](mailto:jrgs@cesar.school)  
    * – Time de Desenvolvimento*  
    
 - **Guilherme Silvestre** – [lgsgs@cesar.school](mailto:lgsgs@cesar.school)  
