@@ -1,4 +1,4 @@
-# Projetos-2
+# MeuJornal
 
 Repositório para o projeto.
 
