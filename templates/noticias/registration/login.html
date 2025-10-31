@@ -1,44 +1,84 @@
-{% extends "noticias/base.html" %}
-{% block content %}
-<div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Acesso à Conta</h1>
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar — MeuJornal</title>
 
-    {% if form.errors %}
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <strong>Erro:</strong> Usuário ou senha incorretos.
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+
+  <div class="container" id="container">
+    <!-- Painel de cadastro: mande para sua rota de registro -->
+    <div class="form-container sign-up">
+      <form action="{% url 'registro' %}" method="get">
+        <h1>Criar conta</h1>
+        <div class="social-icons">
+          <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+          <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+          <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
         </div>
-    {% endif %}
-
-    <form method="post" action="{% url 'login' %}" class="space-y-5">
-        {% csrf_token %}
-        
-        <!-- Campo de Usuário -->
-        <div>
-            <label for="id_username" class="block text-sm font-medium text-gray-700 mb-1">Usuário</label>
-            <input type="text" name="username" id="id_username" required
-                   class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                   placeholder="Digite seu usuário">
-        </div>
-
-        <!-- Campo de Senha -->
-        <div>
-            <label for="id_password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-            <input type="password" name="password" id="id_password" required
-                   class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                   placeholder="Digite sua senha">
-        </div>
-
-        <input type="hidden" name="next" value="{{ next }}">
-        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold transition">
-            Entrar
-        </button>
-    </form>
-
-    <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600">
-            Não tem conta?
-            <a href="{% url 'registro' %}" class="text-indigo-600 hover:text-indigo-800 font-medium">Cadastre-se</a>
-        </p>
+        <span>ou faça seu cadastro na próxima página</span>
+        <button type="submit">Cadastrar</button>
+      </form>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Painel de login: autentica no Django -->
+    <div class="form-container sign-in">
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <h1>Entrar</h1>
+
+        {% if form.errors or form.non_field_errors %}
+          <div class="form-errors">
+            {{ form.non_field_errors }}
+            {% for field in form %}
+              {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="social-icons">
+          <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+          <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+          <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+        </div>
+
+        <span>ou entre com seu e-mail e senha</span>
+
+        <input type="text" name="username" placeholder="Usuário ou e-mail"
+               autocomplete="username" required>
+        <input type="password" name="password" placeholder="Senha"
+               autocomplete="current-password" required>
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+        <a href="{% url 'password_reset' %}">Esqueceu a senha?</a>
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+
+    <div class="toggle-container">
+      <div class="toggle">
+        <div class="toggle-panel toggle-left">
+          <h1>Bem-vindo de volta!</h1>
+          <p>Entre para acompanhar seu progresso.</p>
+          <button class="hidden" id="login" type="button">Entrar</button>
+        </div>
+        <div class="toggle-panel toggle-right">
+          <h1>Olá!</h1>
+          <p>Crie sua conta para usar todos os recursos.</p>
+          <button class="hidden" id="register" type="button">Cadastrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'js/auth.js' %}"></script>
+</body>
+</html>
