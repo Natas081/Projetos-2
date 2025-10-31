@@ -112,7 +112,7 @@ USE_I18N = True
 USE_TZ = True
 
 # -------------------- ARQUIVOS ESTÁTICOS --------------------
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
