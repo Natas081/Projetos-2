@@ -49,7 +49,6 @@ body{
 
 .container button{
     background-color:#512da8; } 
-    button:hover{ filter:brightness(0.95); }
     color: #fff;
     font-size: 12px;
     padding: 10px 45px;
