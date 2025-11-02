@@ -48,7 +48,7 @@ body{
 }
 
 .container button{
-    background-color:#dc2626; } 
+    background-color:#512da8; } 
     button:hover{ filter:brightness(0.95); }
     color: #fff;
     font-size: 12px;
@@ -163,8 +163,7 @@ body{
 }
 
 .toggle{
-    background-color:#b91c1c;
-    background:linear-gradient(to right,#ef4444,#b91c1c);
+    background-color:#512da8;
     height: 100%;
     background: linear-gradient(to right, #5c6bc0, #512da8);
     color: #fff;
