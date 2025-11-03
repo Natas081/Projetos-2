@@ -18,10 +18,10 @@
       {{ pform.avatar }}
       <button class="mt-3 px-4 py-2 rounded bg-red-600 text-white" name="save_profile">Salvar perfil</button>
     </form>
-    {% if user.userprofile.avatar %}
-      <p class="mt-3">Avatar atual:</p>
-      <img class="h-20 w-20 rounded-full object-cover" src="{{ user.userprofile.avatar.url }}" alt="">
-    {% endif %}
+      {% if profile and profile.avatar %}
+        <p class="mt-3">Avatar atual:</p>
+        <img class="h-20 w-20 rounded-full object-cover" src="{{ profile.avatar.url }}" alt="">
+      {% endif %}
   </section>
 
   <section>
