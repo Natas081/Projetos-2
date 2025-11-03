@@ -5,6 +5,19 @@ from django.dispatch import receiver
 from datetime import date, timedelta
 
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    display_name = models.CharField("Nome de exibição", max_length=80, blank=True)
+    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_profile_for_user(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+        
 class Perfil(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     leitura_streak = models.IntegerField(default=0, verbose_name="Sequência de Leitura")
