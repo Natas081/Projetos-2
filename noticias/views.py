@@ -4,6 +4,11 @@ from django.contrib.auth import login, logout
 from django.contrib import messages
 from datetime import date, timedelta
 from .models import Interest, Noticia, Perfil, CheckIn, Goal, DiarioEntry
+from .models import UserProfile
+from .forms import EmailChangeForm, ProfileForm
+from django.contrib.auth.decorators import login_required
+
+
 
 # -----------------------------
 # PÁGINAS PRINCIPAIS
@@ -131,6 +136,44 @@ def logout_usuario(request):
     logout(request)
     messages.info(request, 'Você saiu da conta.')
     return redirect('login')
+
+
+
+------------------------------------------------------------------------------------------------------------
+#PROFILE UPDATE 
+------------------------------------------------------------------------------------------------------------
+
+@login_required
+def settings_view(request):
+    # garante que o usuário tem perfil
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        # POST do bloco "Perfil" (display_name + avatar)
+        if "save_profile" in request.POST:
+            pform = ProfileForm(request.POST, request.FILES, instance=profile)
+            eform = EmailChangeForm(user=request.user, instance=request.user)  # deixa o form de e-mail “limpo”
+            if pform.is_valid():
+                pform.save()
+                messages.success(request, "Perfil atualizado.")
+                return redirect("settings")
+
+        # POST do bloco "Conta" (trocar e-mail)
+        elif "save_email" in request.POST:
+            eform = EmailChangeForm(request.POST, user=request.user, instance=request.user)
+            pform = ProfileForm(instance=profile)
+            if eform.is_valid():
+                eform.save()
+                messages.success(request, "E-mail alterado com sucesso.")
+                return redirect("settings")
+
+    else:
+        # GET: só monta os formulários com dados atuais
+        pform = ProfileForm(instance=profile)
+        eform = EmailChangeForm(user=request.user, instance=request.user)
+
+    return render(request, "noticias/settings.html", {"pform": pform, "eform": eform})
+
 
 # -----------------------------
 # INTERESSES
