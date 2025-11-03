@@ -116,6 +116,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# -------------------- ARQUIVOS DE MÍDIA (uploads) --------------------
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # -------------------- CONFIGURAÇÕES DE LOGIN --------------------
 LOGIN_URL = 'login'              # nome da URL de login
 LOGIN_REDIRECT_URL = 'home'      # redireciona para home após login
