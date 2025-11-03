@@ -1,0 +1,44 @@
+{% extends "noticias/base.html" %}
+{% load static %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Configurações</h1>
+
+{% if messages %}
+  <ul class="mb-3">{% for m in messages %}<li class="text-green-700">{{ m }}</li>{% endfor %}</ul>
+{% endif %}
+
+<div class="grid md:grid-cols-2 gap-8">
+  <section>
+    <h2 class="text-xl font-semibold mb-2">Perfil</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <label class="block mb-1">Nome de exibição</label>
+      {{ pform.display_name }}
+      <label class="block mt-3 mb-1">Foto (avatar)</label>
+      {{ pform.avatar }}
+      <button class="mt-3 px-4 py-2 rounded bg-red-600 text-white" name="save_profile">Salvar perfil</button>
+    </form>
+    {% if user.userprofile.avatar %}
+      <p class="mt-3">Avatar atual:</p>
+      <img class="h-20 w-20 rounded-full object-cover" src="{{ user.userprofile.avatar.url }}" alt="">
+    {% endif %}
+  </section>
+
+  <section>
+    <h2 class="text-xl font-semibold mb-2">Conta</h2>
+    <form method="post">
+      {% csrf_token %}
+      <label class="block mb-1">Novo e-mail</label>
+      {{ eform.email }}
+      <label class="block mt-3 mb-1">Senha atual</label>
+      {{ eform.current_password }}
+      <button class="mt-3 px-4 py-2 rounded bg-red-600 text-white" name="save_email">Alterar e-mail</button>
+    </form>
+
+    <div class="mt-6">
+      <a class="underline text-red-600" href="{% url 'password_change' %}">Alterar senha</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+  
