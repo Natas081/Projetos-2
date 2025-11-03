@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -23,4 +24,17 @@ urlpatterns = [
 
     # Streak
     path('streak/', views.streak_page, name='streak'),
+
+    # Configurações de conta/perfil
+    path('configuracoes/', views.settings_view, name='settings'),
+
+    # Alterar senha (built-in do Django)
+    path('configuracoes/senha/', auth_views.PasswordChangeView.as_view(
+        template_name='noticias/auth/password_change.html'
+    ), name='password_change'),
+    path('configuracoes/senha/ok/', auth_views.PasswordChangeDoneView.as_view(
+        template_name='noticias/auth/password_change_done.html'
+    ), name='password_change_done'),
+
 ]
+
