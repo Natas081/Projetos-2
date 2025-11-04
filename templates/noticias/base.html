@@ -9,7 +9,7 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .nav-link {
-            @apply px-3 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition;
+            @apply px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-md transition;
         }
     </style>
 </head>
@@ -19,7 +19,7 @@
     <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <a href="{% url 'home' %}" class="text-2xl font-extrabold text-indigo-600 tracking-tight">
+                <a href="{% url 'home' %}" class="text-2xl font-extrabold text-red-600 tracking-tight">
                     Meu<span class="text-gray-800">Jornal</span>
                 </a>
                 <div class="flex items-center gap-2">
@@ -33,13 +33,13 @@
                     
                         <form method="post" action="{% url 'logout' %}" class="inline">
                             {% csrf_token %}
-                            <button type="submit" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">
+                            <button type="submit" class="ml-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">
                                 Sair ({{ user.username }})
                             </button>
                         </form>
                     {% else %}
                         <a href="{% url 'login' %}" class="nav-link">Entrar</a>
-                        <a href="{% url 'registro' %}" class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">Cadastrar</a>
+                        <a href="{% url 'registro' %}" class="ml-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">Cadastrar</a>
                     {% endif %}
                 </div>
             </div>
@@ -75,8 +75,8 @@
     {% if user.is_authenticated and perfil %}
     <div class="fixed bottom-6 right-6 bg-white border border-gray-200 shadow-xl rounded-2xl px-5 py-4 z-50">
         <p class="text-sm text-gray-600">🔥 Seu streak:</p>
-        <p class="text-2xl font-bold text-indigo-600">{{ perfil.leitura_streak }} dia(s)</p>
-        <a href="{% url 'streak' %}" class="text-xs text-indigo-500 hover:text-indigo-700 font-medium">Ver mais</a>
+        <p class="text-2xl font-bold text-red-600">{{ perfil.leitura_streak }} dia(s)</p>
+        <a href="{% url 'streak' %}" class="text-xs text-red-500 hover:text-red-700 font-medium">Ver mais</a>
     </div>
     {% endif %}
 
