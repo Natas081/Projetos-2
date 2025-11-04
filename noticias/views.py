@@ -8,14 +8,13 @@ from .models import UserProfile
 from .forms import EmailChangeForm, ProfileForm
 from django.contrib.auth.decorators import login_required
 
-
-
 # -----------------------------
 # PÁGINAS PRINCIPAIS
 # -----------------------------
 def home(request):
     noticias = Noticia.objects.all().order_by('-id')[:5]
-    return render(request, 'noticias/home.html', {"noticias": noticias})
+    perfil = getattr(request.user, 'perfil', None)
+    return render(request, 'noticias/home.html', {"noticias": noticias, "perfil": perfil})
 
 # -----------------------------
 # DIÁRIO DO APRENDIZADO
@@ -100,6 +99,48 @@ def routine_view(request):
     })
 
 # -----------------------------
+# RESUMO SEMANAL
+# -----------------------------
+@login_required
+def resumo_semanal_view(request):
+    perfil = getattr(request.user, 'perfil', None)
+    hoje = date.today()
+
+    # Checa se o usuário tem pelo menos 7 dias de uso
+    primeiro_checkin = CheckIn.objects.filter(usuario=request.user).order_by('data_checkin').first()
+    if not primeiro_checkin or (hoje - primeiro_checkin.data_checkin).days < 7:
+        mensagem = "Resumo semanal disponível após 7 dias de uso"
+        return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
+
+    semana_inicio = hoje - timedelta(days=hoje.weekday())
+    semana_fim = semana_inicio + timedelta(days=6)
+
+    # Interesses registrados na semana
+    interesses_novos = Interest.objects.filter(user=request.user, id__in=Goal.objects.filter(
+        user=request.user, weekStartDate=semana_inicio).values_list('interest_id', flat=True))
+
+    # Assunto mais visto (interesse com mais progressos na semana)
+    maior_interesse = Goal.objects.filter(
+        user=request.user, weekStartDate=semana_inicio).order_by('-currentProgress').first()
+
+    # Anotações do diário da semana
+    anotacoes_semana = DiarioEntry.objects.filter(
+        usuario=request.user,
+        data_criacao__date__range=(semana_inicio, semana_fim)
+    )
+
+    if not interesses_novos.exists() and not anotacoes_semana.exists():
+        mensagem = "Nenhuma novidade nesta semana"
+        return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
+
+    return render(request, 'noticias/resumo_semanal.html', {
+        "interesses_novos": interesses_novos,
+        "maior_interesse": maior_interesse,
+        "anotacoes_semana": anotacoes_semana,
+        "perfil": perfil
+    })
+
+# -----------------------------
 # AUTENTICAÇÃO
 # -----------------------------
 def registro_usuario(request):
@@ -138,11 +179,9 @@ def logout_usuario(request):
     return redirect('login')
 
 
-
-#------------------------------------------------------------------------------------------------------------
-#PROFILE UPDATE 
-#------------------------------------------------------------------------------------------------------------
-
+# -----------------------------
+# PROFILE UPDATE
+# -----------------------------
 @login_required
 def settings_view(request):
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -170,9 +209,8 @@ def settings_view(request):
     return render(request, "noticias/settings.html", {
         "pform": pform,
         "eform": eform,
-        "profile": profile,   # <- ESSENCIAL
+        "profile": profile,
     })
-
 
 
 # -----------------------------
@@ -204,46 +242,52 @@ def gerenciar_interesses(request):
 
             return redirect('pagina_de_interesses')
 
-    interests_list = Interest.objects.filter(user=request.user).order_by('name')
-    return render(request, 'noticias/interesses.html', {'interests_list': interests_list})
+    interests_list = Interest.objects.filter(user=request.user)
+    return render(request, 'noticias/interesses.html', {"interests": interests_list})
 
-
+@login_required
 def delete_interest_view(request, interest_id):
-    if request.method == 'POST' and request.user.is_authenticated:
-        try:
-            interest = Interest.objects.get(id=interest_id, user=request.user)
-            interest.delete()
-            messages.success(request, 'Interesse deletado!')
-        except Interest.DoesNotExist:
-            messages.error(request, 'Interesse não encontrado.')
+    interest = get_object_or_404(Interest, id=interest_id, user=request.user)
+    if request.method == 'POST':
+        interest.delete()
+        messages.success(request, "Interesse deletado com sucesso!")
     return redirect('pagina_de_interesses')
 
-# -----------------------------
-# STREAK
-# -----------------------------
+@login_required
 def streak_page(request):
-    if not request.user.is_authenticated:
-        messages.error(request, "Você precisa estar logado para acessar sua sequência.")
-        return redirect('login')
+    perfil = getattr(request.user, 'perfil', None)
+    today = date.today()
 
-    perfil = request.user.perfil
-    hoje = date.today()
-    ontem = hoje - timedelta(days=1)
+    if request.method == "POST":
+        if not CheckIn.objects.filter(usuario=request.user, data_checkin=today).exists():
+            # cria o check-in
+            CheckIn.objects.create(usuario=request.user, data_checkin=today)
 
-    ja_fez = CheckIn.objects.filter(usuario=request.user, data_checkin=hoje).exists()
+            # atualiza streak
+            if perfil.ultimo_checkin == today - timedelta(days=1):
+                # dia anterior foi check-in → incrementa streak
+                perfil.leitura_streak += 1
+            elif perfil.ultimo_checkin == today:
+                # já fez check-in hoje, não muda
+                messages.info(request, "Você já confirmou seu check-in hoje.")
+                return redirect('streak')
+            else:
+                # não acessou ontem → streak reseta
+                perfil.leitura_streak = 1
 
-    if request.method == 'POST' and not ja_fez:
-        CheckIn.objects.create(usuario=request.user)
-        if perfil.ultima_leitura == ontem:
-            perfil.leitura_streak += 1
+            perfil.ultimo_checkin = today
+            perfil.save()
+
+            messages.success(request, f"Check-in diário confirmado! Seu streak é {perfil.leitura_streak} dias.")
         else:
-            perfil.leitura_streak = 1
-        perfil.ultima_leitura = hoje
-        perfil.save()
-        messages.success(request, "Check-in confirmado com sucesso! 🔥")
+            messages.info(request, "Você já confirmou seu check-in hoje.")
         return redirect('streak')
 
+    # GET: apenas exibe
+    ja_fez_checkin_hoje = perfil.ultimo_checkin == today
+
     return render(request, 'noticias/streak.html', {
-        "perfil": perfil,
-        "ja_fez_checkin_hoje": ja_fez
+        'streak': perfil.leitura_streak,
+        'perfil': perfil,
+        'ja_fez_checkin_hoje': ja_fez_checkin_hoje,
     })

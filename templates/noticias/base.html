@@ -13,67 +13,74 @@
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen bg-gray-50">
+<body class="flex h-full">
 
-    <!-- NAVBAR -->
-    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <a href="{% url 'home' %}" class="text-2xl font-extrabold text-red-600 tracking-tight">
-                    Meu<span class="text-gray-800">Jornal</span>
-                </a>
-                <div class="flex items-center gap-2">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'pagina_de_interesses' %}" class="nav-link">Interesses</a>
-                        <a href="{% url 'routine' %}" class="nav-link">Rotina</a>
-                        <a href="{% url 'diario' %}" class="nav-link">Diário</a>  <!-- NOVO BOTÃO ADICIONADO -->
+    <!-- MENU LATERAL -->
+    <aside class="flex flex-col w-64 h-screen bg-white border-r border-gray-200 p-6">
+        <h1 class="text-2xl font-extrabold text-red-600 mb-8 tracking-tight">
+            Meu<span class="text-gray-800">Jornal</span>
+        </h1>
 
-                        <!-- NOVO link de Configurações -->
-                        <a href="{% url 'settings' %}" class="nav-link">Configurações</a>
-                    
-                        <form method="post" action="{% url 'logout' %}" class="inline">
-                            {% csrf_token %}
-                            <button type="submit" class="ml-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">
-                                Sair ( {% if user.userprofile.display_name %}
-                                            {{ user.userprofile.display_name }}
-                                        {% else %}
-                                            {{ user.username }}
-                                        {% endif %})
-                            </button>
-                        </form>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="nav-link">Entrar</a>
-                        <a href="{% url 'registro' %}" class="ml-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">Cadastrar</a>
-                    {% endif %}
+        {% if user.is_authenticated %}
+        <nav class="flex flex-col gap-3">
+            <a href="{% url 'pagina_de_interesses' %}" class="nav-link">Interesses</a>
+            <a href="{% url 'routine' %}" class="nav-link">Rotina</a>
+            <a href="{% url 'diario' %}" class="nav-link">Diário</a>
+            <a href="{% url 'resumo_semanal' %}" class="nav-link">Resumo Semanal</a>
+            <a href="{% url 'settings' %}" class="nav-link">Configurações</a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">
+                    Sair ( {% if user.userprofile.display_name %}{{ user.userprofile.display_name }}{% else %}{{ user.username }}{% endif %})
+                </button>
+            </form>
+        </nav>
+        {% else %}
+        <nav class="flex flex-col gap-3">
+            <a href="{% url 'login' %}" class="nav-link">Entrar</a>
+            <a href="{% url 'registro' %}" class="ml-0 mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">Cadastrar</a>
+        </nav>
+        {% endif %}
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="flex-grow flex flex-col min-h-screen">
+
+        <!-- NAVBAR TOPO (opcional, pode remover se quiser só lateral) -->
+        <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    <span class="text-lg font-semibold text-gray-700">
+                        <!-- Pode colocar título da página dinamicamente -->
+                        {% block page_title %}Página{% endblock %}
+                    </span>
                 </div>
             </div>
+        </nav>
+
+        <!-- Mensagens -->
+        {% if messages %}
+        <div class="max-w-3xl mx-auto mt-6 px-4">
+            {% for message in messages %}
+                <div class="{% if message.tags == 'success' %} bg-green-100 text-green-800 border-green-300 {% elif message.tags == 'error' %} bg-red-100 text-red-800 border-red-300 {% else %} bg-blue-100 text-blue-800 border-blue-300 {% endif %} border rounded-lg px-4 py-3 mb-4 shadow-sm">
+                    {{ message }}
+                </div>
+            {% endfor %}
         </div>
-    </nav>
+        {% endif %}
 
-    <!-- Mensagens -->
-    {% if messages %}
-    <div class="max-w-2xl mx-auto mt-6 px-4">
-        {% for message in messages %}
-            <div class="{% if message.tags == 'success' %} bg-green-100 text-green-800 border-green-300 {% elif message.tags == 'error' %} bg-red-100 text-red-800 border-red-300 {% else %} bg-blue-100 text-blue-800 border-blue-300 {% endif %} border rounded-lg px-4 py-3 mb-4 shadow-sm">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- Conteúdo principal -->
-    <main class="flex-grow py-10">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Conteúdo principal -->
+        <main class="flex-grow py-10 px-6 sm:px-8 lg:px-10">
             {% block content %}{% endblock %}
-        </div>
-    </main>
+        </main>
 
-    <!-- Rodapé -->
-    <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
-            © 2025 <span class="font-semibold text-red-600">MeuJornal</span> — Todos os direitos reservados.
-        </div>
-    </footer>
+        <!-- Rodapé -->
+        <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
+            <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+                © 2025 <span class="font-semibold text-red-600">MeuJornal</span> — Todos os direitos reservados.
+            </div>
+        </footer>
+    </div>
 
     <!-- Widget fixo do Streak -->
     {% if user.is_authenticated and perfil %}

@@ -35,6 +35,8 @@ urlpatterns = [
     path('configuracoes/senha/ok/', auth_views.PasswordChangeDoneView.as_view(
         template_name='noticias/auth/password_change_done.html'
     ), name='password_change_done'),
+    # Resumo Semanal
+    path('resumo/', views.resumo_semanal_view, name='resumo_semanal'),
 
 ]
 
