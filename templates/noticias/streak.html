@@ -5,9 +5,9 @@
 
     <h1 class="text-3xl font-bold text-gray-800 mb-4">🔥 Seu Streak de Leitura</h1>
 
-    <p class="text-lg text-gray-600 mb-6">
+    <p class="text-lg text-gray-800 mb-6">
         Dias consecutivos de acesso: 
-        <span class="text-4xl font-extrabold text-indigo-600">{{ perfil.leitura_streak }}</span>
+        <span class="text-4xl font-extrabold text-red-600">{{ perfil.leitura_streak }}</span>
     </p>
 
     {% if messages %}
@@ -21,7 +21,7 @@
     {% if not ja_fez_checkin_hoje %}
         <form method="post">
             {% csrf_token %}
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition">
                 ✅ Confirmar acesso de hoje
             </button>
         </form>
