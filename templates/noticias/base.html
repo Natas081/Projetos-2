@@ -34,7 +34,11 @@
                         <form method="post" action="{% url 'logout' %}" class="inline">
                             {% csrf_token %}
                             <button type="submit" class="ml-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">
-                                Sair ({{ user.username }})
+                                Sair ( {% if user.userprofile.display_name %}
+                                            {{ user.userprofile.display_name }}
+                                        {% else %}
+                                            {{ user.username }}
+                                        {% endif %})
                             </button>
                         </form>
                     {% else %}
