@@ -23,9 +23,9 @@
     {% if goals %}
         <ul class="space-y-4">
             {% for goal in goals %}
-                <li class="bg-indigo-50 p-4 rounded-lg shadow-sm flex justify-between items-center">
+                <li class="bg-red-50 p-4 rounded-lg shadow-sm flex justify-between items-center">
                     <div>
-                        <p class="font-medium text-indigo-700">{{ goal.interest.name }}</p>
+                        <p class="font-medium text-red-700">{{ goal.interest.name }}</p>
                         <p class="text-gray-600 text-sm">
                             Progresso: {{ goal.currentProgress }} / {{ goal.targetFrequency }} leituras
                         </p>
@@ -35,7 +35,7 @@
                         <input type="hidden" name="goal_id" value="{{ goal.id }}">
                         {% if goal.currentProgress < goal.targetFrequency %}
                             <button type="submit"
-                                    class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg font-medium transition">
+                                    class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition">
                                 Marcar leitura ✅
                             </button>
                         {% else %}
