@@ -26,7 +26,17 @@
             </button>
         </form>
     {% else %}
-        <p class="text-green-600 font-semibold mt-4">Você já confirmou o acesso hoje! 🎉</p>
+        {% with nome=user.userprofile.display_name %}
+            {% if nome %}
+              <p class="text-green-600 font-semibold mt-4">
+                {{ nome }}, você já confirmou o acesso hoje! 🎉
+              </p>
+            {% else %}
+              <p class="text-green-600 font-semibold mt-4">
+                Você já confirmou o acesso hoje! 🎉
+              </p>
+            {% endif %}
+        {% endwith %}
     {% endif %}
 
 </div>
