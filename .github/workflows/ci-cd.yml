@@ -1,0 +1,74 @@
+# Nome do nosso fluxo de trabalho
+name: CI/CD MeuJornal
+
+# Define quando este fluxo de trabalho deve ser acionado
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # =======================================================
+  # JOB 1: BUILD E TESTE
+  # =======================================================
+  build:
+    name: Build e Teste
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o seu código para a máquina do robô
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      # 2. Configura o ambiente Python
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11' # (Use a versão do seu projeto)
+
+      # 3. ★ NOVO ★ Instala dependências do sistema
+      # (Pillow precisa de libjpeg, Selenium precisa do Chrome)
+      - name: Instalar dependências do Ubuntu (Pillow, Chrome, Driver)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libjpeg-dev zlib1g-dev \
+                                google-chrome-stable \
+                                chromedriver
+          # (O chromedriver do apt pode ficar desatualizado, mas geralmente funciona)
+
+      # 4. Instala todas as dependências do Python
+      - name: Instalar dependências (requirements.txt)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # ★ NOVO ★ Instala o Pillow e Selenium (caso não estejam no requirements)
+          pip install Pillow selenium webdriver-manager
+
+      # 5. Roda os testes do Django
+      - name: Rodar testes (Selenium)
+        env:
+          # ★ NOVO ★ Diz ao tests.py para rodar em modo headless
+          CI: 'true' 
+          # (Você precisa criar este Secret nas Configs do seu GitHub)
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          # (Render usa a DATABASE_URL, o Django vai usar o db.sqlite3 por padrão nos testes)
+        run: |
+          python manage.py test
+
+  # =======================================================
+  # JOB 2: DEPLOY
+  # =======================================================
+  deploy:
+    name: Deploy no Render
+    runs-on: ubuntu-latest
+    needs: build # <-- Só roda se o 'build' passar
+    
+    # ★ CORREÇÃO ★
+    # Seu 'if' estava checando 'master', mas sua branch é 'main'
+    if: github.ref == 'refs/heads/main' 
+
+    steps:
+      - name: 🚀 Disparar deploy automático no Render
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}

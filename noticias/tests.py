@@ -1,5 +1,5 @@
-# Em /noticias/tests.py (VERSÃO FINAL V9)
 
+import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth.models import User
 from selenium import webdriver
@@ -25,12 +25,29 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
+        """
+        Configura o driver do Selenium UMA VEZ para toda a classe de teste.
+        ★ AGORA DETECTA O MODO CI (HEADLESS) ★
+        """
         super().setUpClass()
         service = Service(ChromeDriverManager().install())
+        
         options = webdriver.ChromeOptions()
-        options.add_argument("--start-maximized")
+        
+        # Verifica se está rodando no ambiente de CI (GitHub Actions)
+        if os.environ.get('CI') == 'true':
+            print("Rodando em modo CI (Headless)...")
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            options.add_argument('--window-size=1920,1080') # Define um tamanho de janela
+        else:
+            # Rodando localmente (mostra o navegador)
+            print("Rodando localmente (com navegador visível)...")
+            options.add_argument("--start-maximized")
+        
         cls.driver = webdriver.Chrome(service=service, options=options)
-        cls.wait = WebDriverWait(cls.driver, 10)
+        cls.wait = WebDriverWait(cls.driver, 10) # Espera explícita de 10s
 
     @classmethod
     def tearDownClass(cls):
