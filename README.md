@@ -113,7 +113,10 @@ Repositório para o projeto.
    * Bug Tracker.
 
 
-   Criação do CI-CD
+   * Criação do CI-CD
+   <img width="1919" height="950" alt="image" src="https://github.com/user-attachments/assets/f325bb6c-cf58-4d5c-b15f-b9015a3b8a21" />
+   
+
 
      
    * Acompanhamento de bugs (bugtrackers).    </details>
