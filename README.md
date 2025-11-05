@@ -115,6 +115,8 @@ Repositório para o projeto.
 
    * Criação do CI-CD
    <img width="1919" height="950" alt="image" src="https://github.com/user-attachments/assets/f325bb6c-cf58-4d5c-b15f-b9015a3b8a21" />
+   <img width="1919" height="968" alt="image" src="https://github.com/user-attachments/assets/42df3ccd-4e3a-47cf-9990-9451ff7d2c65" />
+
    
 
 
