@@ -47,14 +47,14 @@ Repositório para o projeto.
 
 ##  Entregáveis  
 <details>
-  <summary>- ✅ Semana 6 </summary>
+  <summary>- ✅ Semana 8 </summary>
   
   * Criação de 7 histórias de usuário no Google Docs.
   
 </details>
 
 <details>
-  <summary>- ✅ Semana 7 </summary>
+  <summary>- ✅ Semana 9 </summary>
   
   * Conferência das histórias.
   
@@ -63,14 +63,14 @@ Repositório para o projeto.
 </details>
 
 <details>
-  <summary>- ✅ Semana 8 </summary>
+  <summary>- ✅ Semana 10 </summary>
   
   * Implementação da primeira história: *Streak de Leitura Diária*.
   
 </details>
 
 <details>
-  <summary>- ✅ Semana 9 </summary>
+  <summary>- ✅ Semana 11 </summary>
   
   * Implementação da segunda história: *Rotina de Interesses e Metas*.
   
@@ -81,7 +81,7 @@ Repositório para o projeto.
   * Render: https://meujornal.onrender.com/.
 </details>
 
-<details>   <summary>- ✅ Semana 10 </summary>      
+<details>   <summary>- ✅ Semana 12 </summary>      
    
    * Implementação de mais uma história de usuário: Diário de aprendizado. 
    
@@ -92,5 +92,32 @@ Repositório para o projeto.
 
      
    * Acompanhamento de bugs (bugtrackers).    </details>
+
+   <details>   <summary>- ✅ Semana 13 </summary>      
+   
+   * Implementação de mais uma história de usuário: Resumo semanal. 
+   
+   * Continuação dos testes automatizados.
+
+   * Bug Tracker.
+
+     
+   * Acompanhamento de bugs (bugtrackers).    </details>
+
+   <details>   <summary>- ✅ Semana 14 </summary>      
+   
+   * Implementação de mais uma história de usuário: . 
+   
+   * Continuação de testes automatizados.
+
+   * Bug Tracker.
+
+
+   Criação do CI-CD
+
+     
+   * Acompanhamento de bugs (bugtrackers).    </details>
+
+
 
 ---
