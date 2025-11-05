@@ -5,7 +5,7 @@ from django.contrib import messages
 from datetime import date, timedelta
 from .models import Interest, Noticia, Perfil, CheckIn, Goal, DiarioEntry
 from .models import UserProfile
-from .forms import EmailChangeForm, ProfileForm
+from .forms import UsernameChangeForm, ProfileForm
 from django.contrib.auth.decorators import login_required
 
 # -----------------------------
@@ -182,35 +182,31 @@ def logout_usuario(request):
 # -----------------------------
 # PROFILE UPDATE
 # -----------------------------
+
 @login_required
 def settings_view(request):
-    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    perfil = request.user.userprofile  # já existe
+    pform = ProfileForm(request.POST or None, request.FILES or None, instance=perfil)
+    uform = UsernameChangeForm(request.user, request.POST or None)
 
     if request.method == "POST":
-        if "save_profile" in request.POST:
-            pform = ProfileForm(request.POST, request.FILES, instance=profile)
-            eform = EmailChangeForm(user=request.user, instance=request.user)
-            if pform.is_valid():
-                pform.save()
-                messages.success(request, "Perfil atualizado.")
-                return redirect("settings")
+        # Salvar perfil
+        if "save_profile" in request.POST and pform.is_valid():
+            pform.save()
+            messages.success(request, "Perfil atualizado com sucesso!")
+            return redirect("settings")
 
-        elif "save_email" in request.POST:
-            eform = EmailChangeForm(request.POST, user=request.user, instance=request.user)
-            pform = ProfileForm(instance=profile)
-            if eform.is_valid():
-                eform.save()
-                messages.success(request, "E-mail alterado com sucesso.")
-                return redirect("settings")
-    else:
-        pform = ProfileForm(instance=profile)
-        eform = EmailChangeForm(user=request.user, instance=request.user)
+        # Alterar usuário (novo login)
+        if "save_username" in request.POST and uform.is_valid():
+            uform.save()
+            messages.success(request, "Usuário alterado com sucesso!")
+            return redirect("settings")
 
-    return render(request, "noticias/settings.html", {
+    context = {
         "pform": pform,
-        "eform": eform,
-        "profile": profile,
-    })
+        "uform": uform,
+    }
+    return render(request, "noticias/settings.html", context)
 
 
 # -----------------------------
