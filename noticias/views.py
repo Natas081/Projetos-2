@@ -7,6 +7,7 @@ from .models import Interest, Noticia, Perfil, CheckIn, Goal, DiarioEntry
 from .models import UserProfile
 from .forms import EmailChangeForm, ProfileForm
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 # -----------------------------
 # PÁGINAS PRINCIPAIS
@@ -104,24 +105,40 @@ def routine_view(request):
 @login_required
 def resumo_semanal_view(request):
     perfil = getattr(request.user, 'perfil', None)
-    hoje = date.today()
+    hoje = timezone.localdate() # Usa o timezone do Django
 
     # Checa se o usuário tem pelo menos 7 dias de uso
     primeiro_checkin = CheckIn.objects.filter(usuario=request.user).order_by('data_checkin').first()
-    if not primeiro_checkin or (hoje - primeiro_checkin.data_checkin).days < 7:
+    
+    if not primeiro_checkin:
+        # Se NUNCA fez checkin, mostra a mensagem
         mensagem = "Resumo semanal disponível após 7 dias de uso"
         return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
 
+    # ★ CORREÇÃO LÓGICA ★
+    # Compara a data do primeiro checkin (ignorando a hora) com hoje
+    dias_de_uso = (hoje - primeiro_checkin.data_checkin).days
+    
+    if dias_de_uso < 7:
+        # Cenário 3
+        mensagem = "Resumo semanal disponível após 7 dias de uso"
+        return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
+
+    # Se chegou aqui, tem 7+ dias. Continua para a lógica da semana.
     semana_inicio = hoje - timedelta(days=hoje.weekday())
     semana_fim = semana_inicio + timedelta(days=6)
 
-    # Interesses registrados na semana
-    interesses_novos = Interest.objects.filter(user=request.user, id__in=Goal.objects.filter(
-        user=request.user, weekStartDate=semana_inicio).values_list('interest_id', flat=True))
+    # Interesses registrados na semana (Goals criados na semana)
+    interesses_novos = Interest.objects.filter(
+        user=request.user, 
+        goals__weekStartDate=semana_inicio
+    ).distinct()
 
-    # Assunto mais visto (interesse com mais progressos na semana)
+    # Assunto mais visto
     maior_interesse = Goal.objects.filter(
-        user=request.user, weekStartDate=semana_inicio).order_by('-currentProgress').first()
+        user=request.user, 
+        weekStartDate=semana_inicio
+    ).order_by('-currentProgress').first()
 
     # Anotações do diário da semana
     anotacoes_semana = DiarioEntry.objects.filter(
@@ -129,10 +146,12 @@ def resumo_semanal_view(request):
         data_criacao__date__range=(semana_inicio, semana_fim)
     )
 
-    if not interesses_novos.exists() and not anotacoes_semana.exists():
+    # Cenário 2
+    if not interesses_novos.exists() and not maior_interesse and not anotacoes_semana.exists():
         mensagem = "Nenhuma novidade nesta semana"
         return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
 
+    # Cenário 1
     return render(request, 'noticias/resumo_semanal.html', {
         "interesses_novos": interesses_novos,
         "maior_interesse": maior_interesse,
