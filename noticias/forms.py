@@ -3,9 +3,25 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.auth import authenticate
+from .models import UserProfile
 
 User = get_user_model()
 
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ["display_name", "avatar"]
+        widgets = {
+            "display_name": forms.TextInput(attrs={
+                "class": "w-full border border-gray-300 rounded-md px-3 py-2",
+                "placeholder": "Seu nome de exibição"
+            }),
+            "avatar": forms.ClearableFileInput(attrs={
+                "class": "block w-full text-sm text-gray-700"
+            }),
+        }
+        
 class UsernameChangeForm(forms.Form):
     username = forms.CharField(
         max_length=150,
