@@ -21,9 +21,10 @@
 
     <!-- MENU LATERAL -->
     <aside class="flex flex-col w-64 h-screen bg-white border-r border-gray-200 p-6">
-      <h1 class="text-2xl font-extrabold text-red-600 mb-6 tracking-tight">
-        Meu<span class="text-gray-800">Jornal</span>
-      </h1>
+      <!-- Logo -->
+      <a href="{% url 'home' %}" class="mb-6 inline-flex items-center">
+        <img src="{% static 'img/logo-meujornal.png' %}" alt="MeuJornal" class="h-8 w-auto" />
+      </a>
 
       {% if user.is_authenticated %}
         <!-- Cartão do usuário -->
