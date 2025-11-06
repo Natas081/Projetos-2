@@ -20,69 +20,52 @@
 
 
     <!-- MENU LATERAL -->
-    <aside class="flex flex-col w-64 h-screen bg-white border-r border-gray-200 p-6">
-      <!-- Logo -->
-      <a href="{% url 'home' %}" class="mb-6 inline-flex items-center">
-        <img src="{% static 'MeuJornal2..png' %}" alt="MeuJornal" class="h-13 w-auto" />
-      </a>
+<aside class="flex flex-col w-64 h-screen bg-white border-r border-gray-200 p-6">
+  <!-- Logo -->
+  <a href="{% url 'home' %}" class="block mb-6">
+    <img src="{% static 'noticias/MeuJornal2.png' %}" alt="MeuJornal" class="h-7 w-auto">
+  </a>
 
-      {% if user.is_authenticated %}
-        <!-- Cartão do usuário -->
-        <a href="{% url 'settings' %}"
-           class="group flex items-center gap-3 p-3 mb-6 rounded-xl border border-gray-200 hover:bg-gray-50 transition">
-         <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-            {% if avatar_url %}
-              <img src="{{ avatar_url }}" alt="{{ display_name }}" class="h-full w-full object-cover">
-            {% else %}
-              <span class="text-sm font-semibold text-gray-700">
-                {{ display_name|initials_from_name }}
-              </span>
-            {% endif %}
-          </div>
-          <div class="min-w-0">
-            <p class="text-sm font-semibold text-gray-900 truncate">{{ display_name }}</p>
-            <p class="text-xs text-gray-500 truncate">@{{ user.username }}</p>
-          </div>
-          <svg class="ml-auto h-4 w-4 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707A1 1 0 118.707 5.293l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-          </svg>
-        </a>
+  {% if user.is_authenticated %}
+    <!-- Navegação -->
+    <nav class="flex flex-col gap-3">
+      <a href="{% url 'pagina_de_interesses' %}" class="nav-link">Interesses</a>
+      <a href="{% url 'routine' %}" class="nav-link">Rotina</a>
+      <a href="{% url 'diario' %}" class="nav-link">Diário</a>
+      <a href="{% url 'resumo_semanal' %}" class="nav-link">Resumo Semanal</a>
+      {# REMOVIDO: Configurações do menu principal #}
+    </nav>
 
-        <!-- Navegação -->
-        <nav class="flex flex-col gap-3">
-          <a href="{% url 'pagina_de_interesses' %}" class="nav-link">Interesses</a>
-          <a href="{% url 'routine' %}" class="nav-link">Rotina</a>
-          <a href="{% url 'diario' %}" class="nav-link">Diário</a>
-          <a href="{% url 'resumo_semanal' %}" class="nav-link">Resumo Semanal</a>
-        </nav>
+    <!-- empurra o cartão do usuário para o rodapé da sidebar -->
+    <div class="mt-auto"></div>
 
-        <!-- Cartão do usuário “fixo” no rodapé da sidebar -->
-        <a href="{% url 'settings' %}"
-                class="mt-auto group flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition">
-            <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-              {% if avatar_url %}
-                <img src="{{ avatar_url }}" alt="{{ display_name }}" class="h-full w-full object-cover">
-              {% else %}
-                <span class="text-sm font-semibold text-gray-700">
-                  {{ display_name|initials_from_name }}
-                </span>
-              {% endif %}
-            </div>
-            <div class="min-w-0">
-              <p class="text-sm font-semibold text-gray-900 truncate">{{ display_name }}</p>
-              <p class="text-xs text-gray-500 truncate">@{{ user.username }}</p>
-            </div>
-            <svg class="ml-auto h-4 w-4 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707A1 1 0 118.707 5.293l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-            </svg>
-        </a>
-    {% else %}
-      <nav class="flex flex-col gap-3">
-        <a href="{% url 'login' %}" class="nav-link">Entrar</a>
-        <a href="{% url 'registro' %}" class="ml-0 mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">Cadastrar</a>
-      </nav>
-    {% endif %}
-    </aside>
+    <!-- Cartão do usuário (rodapé da sidebar) -->
+    <a href="{% url 'settings' %}"
+       class="group flex items-center gap-3 p-3 mt-6 rounded-xl border border-gray-200 hover:bg-gray-50 transition">
+      <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+        {% if avatar_url %}
+          <img src="{{ avatar_url }}" alt="{{ display_name }}" class="h-full w-full object-cover">
+        {% else %}
+          <span class="text-sm font-semibold text-gray-700">
+            {{ display_name|initials_from_name }}
+          </span>
+        {% endif %}
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm font-semibold text-gray-900 truncate">{{ display_name }}</p>
+        <p class="text-xs text-gray-500 truncate">@{{ user.username }}</p>
+      </div>
+      <svg class="ml-auto h-4 w-4 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707A1 1 0 118.707 5.293l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+      </svg>
+    </a>
+  {% else %}
+    <nav class="flex flex-col gap-3">
+      <a href="{% url 'login' %}" class="nav-link">Entrar</a>
+      <a href="{% url 'registro' %}" class="ml-0 mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">Cadastrar</a>
+    </nav>
+  {% endif %}
+</aside>
 
 
     <!-- CONTEÚDO PRINCIPAL -->
