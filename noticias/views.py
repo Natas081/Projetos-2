@@ -204,28 +204,56 @@ def logout_usuario(request):
 
 @login_required
 def settings_view(request):
-    perfil = request.user.userprofile  # já existe
-    pform = ProfileForm(request.POST or None, request.FILES or None, instance=perfil)
-    uform = UsernameChangeForm(request.user, request.POST or None)
+    # Garante que o perfil exista (evita DoesNotExist -> 500)
+    perfil, _ = UserProfile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
-        # Salvar perfil
-        if "save_profile" in request.POST and pform.is_valid():
-            pform.save()
-            messages.success(request, "Perfil atualizado com sucesso!")
-            return redirect("settings")
+        # Descobre qual botão foi clicado e só binda o form correspondente
+        if "save_profile" in request.POST:
+            pform = ProfileForm(request.POST, request.FILES, instance=perfil)
+            uform = UsernameChangeForm(request.user)  # não binda
+            if pform.is_valid():
+                pform.save()
+                messages.success(request, "Perfil atualizado com sucesso!")
+                return redirect("settings")
 
-        # Alterar usuário (novo login)
-        if "save_username" in request.POST and uform.is_valid():
-            uform.save()
-            messages.success(request, "Usuário alterado com sucesso!")
-            return redirect("settings")
+        elif "save_username" in request.POST:
+            pform = ProfileForm(instance=perfil)  # não binda
+            uform = UsernameChangeForm(request.user, request.POST)
+            if uform.is_valid():
+                uform.save()
+                messages.success(request, "Usuário alterado com sucesso!")
+                return redirect("settings")
 
-    context = {
-        "pform": pform,
-        "uform": uform,
-    }
-    return render(request, "noticias/settings.html", context)
+        else:
+            # POST inesperado: renderiza formulários “vazios”
+            pform = ProfileForm(instance=perfil)
+            uform = UsernameChangeForm(request.user)
+
+    else:
+        # GET normal
+        pform = ProfileForm(instance=perfil)
+        uform = UsernameChangeForm(request.user)
+
+    # Evita erro ao acessar .url quando não há avatar
+    avatar_url = (
+        perfil.avatar.url
+        if getattr(perfil, "avatar", None) and getattr(perfil.avatar, "name", "")
+        else None
+    )
+    # Fallback: se não houver display_name, usa username
+    display_name = perfil.display_name or request.user.get_username()
+
+    return render(
+        request,
+        "noticias/settings.html",
+        {
+            "pform": pform,
+            "uform": uform,
+            "avatar_url": avatar_url,
+            "display_name": display_name,
+        },
+    )
 
 
 # -----------------------------
