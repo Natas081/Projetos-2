@@ -1,91 +1,129 @@
 {% extends "noticias/base.html" %}
 {% load static %}
+{% load user_extras %} {# para o filtro initials_from_name, se você estiver usando #}
+
+{% block page_title %}Configurações{% endblock %}
+
 {% block content %}
+<div class="max-w-6xl mx-auto">
 
+  <!-- Título -->
+  <h1 class="text-3xl font-extrabold text-gray-900 mb-8">Configurações</h1>
 
-<div class="max-w-5xl mx-auto mt-10 grid lg:grid-cols-2 gap-8">
+  <!-- GRID PRINCIPAL: Perfil + Conta -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
 
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold">Configurações</h1>
+    <!-- BLOCO: CONTA -->
+    <section class="rounded-2xl overflow-hidden shadow-xl border border-red-200">
+      <div class="bg-gradient-to-br from-red-600 to-red-500 px-6 py-4">
+        <h2 class="text-white text-xl font-bold">Conta</h2>
+        <p class="text-white/80 text-sm">Gerencie seu usuário e senha</p>
+      </div>
 
-    <!-- Botão de sair (logout) -->
-    <form method="post" action="{% url 'logout' %}">
-      {% csrf_token %}
-      <button type="submit"
-              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-semibold">
-        Sair
-      </button>
-    </form>
+      <div class="bg-white p-6">
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+          {# Espera uform.username e uform.current_password (ou semelhante) #}
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Novo usuário</label>
+            {{ uform.username|add_class:"w-full rounded-md border-gray-300 focus:border-red-500 focus:ring-red-500" }}
+            {% if uform.username.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ uform.username.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Senha atual</label>
+            {{ uform.current_password|add_class:"w-full rounded-md border-gray-300 focus:border-red-500 focus:ring-red-500" }}
+            {% if uform.current_password.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ uform.current_password.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button name="save_username" class="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white font-semibold">
+              Alterar usuário
+            </button>
+
+            <a href="{% url 'password_change' %}"
+               class="inline-flex items-center px-3 py-2 rounded-md border border-red-300 text-red-700 hover:bg-red-50 font-medium">
+              Alterar senha
+            </a>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- BLOCO: PERFIL -->
+    <section class="rounded-2xl overflow-hidden shadow-xl border border-red-200">
+      <div class="bg-gradient-to-br from-red-600 to-red-500 px-6 py-4">
+        <h2 class="text-white text-xl font-bold">Perfil</h2>
+        <p class="text-white/80 text-sm">Nome de exibição e foto</p>
+      </div>
+
+      <div class="bg-white p-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
+          {% csrf_token %}
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nome de exibição</label>
+            {{ pform.display_name|add_class:"w-full rounded-md border-gray-300 focus:border-red-500 focus:ring-red-500" }}
+            {% if pform.display_name.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ pform.display_name.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Foto (avatar)</label>
+            {{ pform.avatar }}
+            {% if pform.avatar.errors %}
+              <p class="text-sm text-red-600 mt-1">{{ pform.avatar.errors|striptags }}</p>
+            {% endif %}
+          </div>
+
+          {% comment %}
+          Preview do avatar atual — usa 'perfil' do context_processor.
+          Ajuste para 'user.userprofile' se o seu objeto for outro.
+          {% endcomment %}
+          <div class="pt-1">
+            <p class="text-sm text-gray-600 mb-2">Avatar atual:</p>
+            <div class="h-20 w-20 rounded-full border-2 border-red-300 overflow-hidden flex items-center justify-center">
+              {% if perfil and perfil.avatar %}
+                <img src="{{ perfil.avatar.url }}" alt="Avatar" class="h-full w-full object-cover">
+              {% else %}
+                <span class="text-lg font-semibold text-gray-600">
+                  {{ (perfil.display_name|default:user.username)|initials_from_name }}
+                </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <button name="save_profile" class="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white font-semibold">
+            Salvar perfil
+          </button>
+        </form>
+      </div>
+    </section>
+
   </div>
 
-  
-  <!-- CARTÃO PERFIL -->
-  <section class="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Perfil</h2>
-
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-
-      <label class="block text-sm font-medium text-gray-700 mb-1">Nome de exibição</label>
-      {{ pform.display_name }}
-
-      <label class="block text-sm font-medium text-gray-700 mt-4 mb-1">Foto (avatar)</label>
-      {{ pform.avatar }}
-
-      <button class="mt-6 inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold shadow transition"
-              name="save_profile">
-        Salvar perfil
-      </button>
-    </form>
-
-    {% if user.userprofile.avatar %}
-      <div class="mt-6">
-        <p class="text-sm text-gray-600 mb-2">Avatar atual:</p>
-        <img class="h-20 w-20 rounded-full object-cover ring-2 ring-red-500"
-             src="{{ user.userprofile.avatar.url }}" alt="Avatar">
+  <!-- CAIXA MENOR: LOGOUT (canto inferior esquerdo do conteúdo) -->
+  <div class="max-w-sm">
+    <div class="rounded-2xl border border-red-200 shadow-md overflow-hidden">
+      <div class="bg-gradient-to-r from-red-600 to-red-500 px-4 py-2">
+        <h3 class="text-white font-semibold">Sessão</h3>
       </div>
-    {% endif %}
-  </section>
-
-  <!-- CARTÃO CONTA (visual de login) -->
-  <section class="relative overflow-hidden rounded-2xl">
-    <div class="absolute inset-0 bg-gradient-to-br from-red-700 to-red-500"></div>
-    <div class="relative p-8 md:p-10 text-white">
-      <h2 class="text-2xl font-extrabold mb-6">Conta</h2>
-
-      <!-- “Ícones sociais” apenas decorativos para harmonizar com a tela de login -->
-      <div class="flex items-center gap-3 mb-6">
-        <span class="inline-flex justify-center items-center w-10 h-10 bg-white/10 rounded-lg backdrop-blur">G+</span>
-        <span class="inline-flex justify-center items-center w-10 h-10 bg-white/10 rounded-lg backdrop-blur">f</span>
-        <span class="inline-flex justify-center items-center w-10 h-10 bg-white/10 rounded-lg backdrop-blur">GH</span>
-        <span class="inline-flex justify-center items-center w-10 h-10 bg-white/10 rounded-lg backdrop-blur">in</span>
-      </div>
-
-      <form method="post" class="space-y-4">
-        {% csrf_token %}
-
-        <div>
-          <label class="block text-sm font-medium text-white/90 mb-1">Novo usuário</label>
-          {{ uform.username }}
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-white/90 mb-1">Senha atual</label>
-          {{ uform.current_password }}
-        </div>
-
-        <button class="mt-2 w-full md:w-auto inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-white text-red-700 font-semibold hover:bg-gray-100 transition shadow"
-                name="save_username">
-          Alterar usuário
-        </button>
-      </form>
-
-      <div class="mt-6">
-        <a class="underline underline-offset-4 decoration-white/40 hover:decoration-white"
-           href="{% url 'password_change' %}">Alterar senha</a>
+      <div class="bg-white p-4">
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="w-full px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white font-semibold">
+            Sair da conta
+          </button>
+        </form>
       </div>
     </div>
-  </section>
+  </div>
 
 </div>
 {% endblock %}
+
