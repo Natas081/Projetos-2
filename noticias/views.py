@@ -207,53 +207,47 @@ def settings_view(request):
     # Garante que o perfil exista (evita DoesNotExist -> 500)
     perfil, _ = UserProfile.objects.get_or_create(user=request.user)
 
+    # Inicializa forms "não bindados" por padrão
+    pform = ProfileForm(instance=perfil)
+    uform = UsernameChangeForm(request.user)
+
     if request.method == "POST":
-        # Descobre qual botão foi clicado e só binda o form correspondente
+        # Salvar PERFIL (display_name + avatar)
         if "save_profile" in request.POST:
             pform = ProfileForm(request.POST, request.FILES, instance=perfil)
-            uform = UsernameChangeForm(request.user)  # não binda
             if pform.is_valid():
                 pform.save()
                 messages.success(request, "Perfil atualizado com sucesso!")
                 return redirect("settings")
 
+        # Salvar USERNAME (trocar usuário de login)
         elif "save_username" in request.POST:
-            pform = ProfileForm(instance=perfil)  # não binda
             uform = UsernameChangeForm(request.user, request.POST)
             if uform.is_valid():
                 uform.save()
                 messages.success(request, "Usuário alterado com sucesso!")
                 return redirect("settings")
 
-        else:
-            # POST inesperado: renderiza formulários “vazios”
-            pform = ProfileForm(instance=perfil)
-            uform = UsernameChangeForm(request.user)
+        # Outros POSTs caem aqui e só re-renderizam com os forms atuais
 
-    else:
-        # GET normal
-        pform = ProfileForm(instance=perfil)
-        uform = UsernameChangeForm(request.user)
+    # Monta avatar_url com segurança (evita .url sem arquivo)
+    avatar_url = None
+    try:
+        if getattr(perfil, "avatar", None) and getattr(perfil.avatar, "name", ""):
+            avatar_url = perfil.avatar.url
+    except Exception:
+        avatar_url = None
 
-    # Evita erro ao acessar .url quando não há avatar
-    avatar_url = (
-        perfil.avatar.url
-        if getattr(perfil, "avatar", None) and getattr(perfil.avatar, "name", "")
-        else None
-    )
-    # Fallback: se não houver display_name, usa username
-    display_name = perfil.display_name or request.user.get_username()
+    # Fallback do nome de exibição
+    display_name = (perfil.display_name or request.user.get_username()).strip()
 
-    return render(
-        request,
-        "noticias/settings.html",
-        {
-            "pform": pform,
-            "uform": uform,
-            "avatar_url": avatar_url,
-            "display_name": display_name,
-        },
-    )
+    context = {
+        "pform": pform,
+        "uform": uform,
+        "avatar_url": avatar_url,
+        "display_name": display_name,
+    }
+    return render(request, "noticias/settings.html", context)
 
 
 # -----------------------------
