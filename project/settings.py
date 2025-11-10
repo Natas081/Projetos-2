@@ -127,3 +127,9 @@ LOGOUT_REDIRECT_URL = 'home'     # redireciona para home após logout
 
 # -------------------- CHAVE PADRÃO DE PK --------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Em project/settings.py
+
+# ... (todo o resto das suas configurações)
+
+# ADICIONE ESTA LINHA NO FINAL
+LOGIN_URL = 'login'

@@ -3,19 +3,75 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from datetime import date, timedelta
-from .models import Interest, Noticia, Perfil, CheckIn, Goal, DiarioEntry
-from .models import UserProfile
+from .models import Interest, Noticia, Perfil, CheckIn, Goal, DiarioEntry, UserProfile, Categoria
 from .forms import UsernameChangeForm, ProfileForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-
 # -----------------------------
 # PÁGINAS PRINCIPAIS
 # -----------------------------
+@login_required 
 def home(request):
-    noticias = Noticia.objects.all().order_by('-id')[:5]
     perfil = getattr(request.user, 'perfil', None)
-    return render(request, 'noticias/home.html', {"noticias": noticias, "perfil": perfil})
+    profile = getattr(request.user, 'userprofile', None)
+
+    if not profile:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    # 1. Pega os temas que o usuário salvou no perfil
+    temas_salvos = profile.categorias_seguidas.all()
+
+    # 2. Se o usuário NÃO salvou nenhum tema ainda...
+    if not temas_salvos.exists():
+        # ...manda ele para a página de "Opções" para escolher
+        messages.info(request, "Bem-vindo! Por favor, escolha seus temas de interesse para começar.")
+        return redirect('gerenciar_temas') 
+    
+    # 3. SE ELE JÁ SALVOU TEMAS:
+    #    Esta é a parte que filtra e remove o limite de 5
+    noticias = Noticia.objects.filter(categoria__in=temas_salvos).order_by('-id')
+    
+    return render(request, 'noticias/home.html', {
+        "noticias": noticias, 
+        "perfil": perfil
+    })
+
+@login_required
+def gerenciar_temas_view(request):
+    profile = request.user.userprofile
+    
+    # Pega todos os 10 temas (para os checkboxes)
+    todas_categorias = Categoria.objects.all().order_by('nome')
+    
+    # Pega os temas que o usuário JÁ salvou (para marcar os checkboxes)
+    temas_salvos = profile.categorias_seguidas.all()
+
+    if request.method == 'POST':
+        # Pega a lista de IDs dos checkboxes que o usuário marcou
+        selecionadas_ids = request.POST.getlist('temas_selecionados')
+
+        # Validação: Se ele clicou em "Salvar" sem marcar nada
+        if not selecionadas_ids:
+            messages.error(request, "Você precisa seguir ao menos uma categoria para salvar.")
+            # Re-renderiza a página com a mensagem de erro
+            return render(request, 'noticias/gerenciar_temas.html', {
+                'todas_categorias': todas_categorias,
+                'temas_salvos': temas_salvos 
+            })
+        
+        # Salva as novas preferências
+        profile.categorias_seguidas.set(selecionadas_ids)
+        
+        messages.success(request, "Preferências salvas!")
+        # Redireciona de volta para o Dashboard, que agora mostrará o filtro
+        return redirect('home') 
+
+    # Se for GET (só carregando a página)
+    context = {
+        'todas_categorias': todas_categorias,
+        'temas_salvos': temas_salvos
+    }
+    return render(request, 'noticias/gerenciar_temas.html', context)
 
 # -----------------------------
 # DIÁRIO DO APRENDIZADO
