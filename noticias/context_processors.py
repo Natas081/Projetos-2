@@ -8,21 +8,17 @@ def streak_processor(request):
     user_profile = None
 
     if request.user.is_authenticated:
-        try:
-            perfil = request.user.perfil
-        except Perfil.DoesNotExist:
-            perfil = None
-        try:
-            user_profile = request.user.userprofile
-        except UserProfile.DoesNotExist:
-            user_profile = None
+        # ✅ Busca segura (não quebra se não existir)
+        perfil = Perfil.objects.filter(usuario=request.user).first()
+        user_profile = UserProfile.objects.filter(user=request.user).first()
 
+        # ✅ Só verifica check-in se o perfil existir
         if perfil:
             ja_fez_checkin_hoje = CheckIn.objects.filter(
                 usuario=request.user, data_checkin=date.today()
             ).exists()
 
-    # nomes para o card do usuário
+    # ✅ Dados de exibição no card
     display_name = None
     avatar_url = None
     if user_profile:
