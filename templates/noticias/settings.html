@@ -40,7 +40,7 @@
           </div>
 
           <div class="flex items-center gap-3">
-            <button class="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white font-semibold">
+            <button type="submit" name="save_username" class="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white font-semibold">
               Alterar usuário
             </button>
 
@@ -88,13 +88,13 @@
                 <img src="{{ perfil.avatar.url }}" alt="Avatar" class="h-full w-full object-cover">
               {% else %}
                 <span class="text-lg font-semibold text-gray-600">
-                  {{ (perfil.display_name|default:user.username)|initials_from_name }}
+                  {{ perfil.display_name|default:user.username|initials_from_name }}
                 </span>
               {% endif %}
             </div>
           </div>
 
-          <button class="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white font-semibold">
+          <button type="submit" name="save_profile" class="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white font-semibold">
             Salvar perfil
           </button>
         </form>
