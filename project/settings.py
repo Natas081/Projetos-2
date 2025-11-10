@@ -19,12 +19,11 @@ SECRET_KEY = os.environ.get(
 DEBUG = 'RENDER' not in os.environ
 
 # -------------------- HOSTS PERMITIDOS --------------------
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-    ALLOWED_HOSTS.append('.onrender.com')
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '.onrender.com',       # ✅ Permite seu domínio do Render
+]
 
 # -------------------- APLICAÇÕES INSTALADAS --------------------
 INSTALLED_APPS = [
@@ -45,7 +44,7 @@ INSTALLED_APPS = [
 # -------------------- MIDDLEWARE --------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ WhiteNoise deve ficar logo abaixo de Security
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -61,8 +60,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
 
-        # Diretório principal de templates
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'templates'],  # ✅ Diretório global de templates
 
         'APP_DIRS': True,
 
@@ -90,7 +88,7 @@ DATABASES = {
     }
 }
 
-# Render usa variável DATABASE_URL
+# ✅ Usar banco do Render, caso exista
 if 'DATABASE_URL' in os.environ:
     DATABASES['default'] = dj_database_url.config(
         conn_max_age=600,
@@ -113,7 +111,7 @@ USE_TZ = True
 
 # -------------------- ARQUIVOS ESTÁTICOS --------------------
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # -------------------- ARQUIVOS DE MÍDIA (uploads) --------------------
@@ -121,15 +119,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # -------------------- CONFIGURAÇÕES DE LOGIN --------------------
-LOGIN_URL = 'login'              # nome da URL de login
-LOGIN_REDIRECT_URL = 'home'      # redireciona para home após login
-LOGOUT_REDIRECT_URL = 'home'     # redireciona para home após logout
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
 # -------------------- CHAVE PADRÃO DE PK --------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-# Em project/settings.py
-
-# ... (todo o resto das suas configurações)
-
-# ADICIONE ESTA LINHA NO FINAL
-LOGIN_URL = 'login'
