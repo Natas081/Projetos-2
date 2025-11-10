@@ -109,10 +109,14 @@ def resumo_semanal_view(request):
 
     primeiro_checkin = CheckIn.objects.filter(usuario=request.user).order_by('data_checkin').first()
     
+    # Se o usuário NUNCA fez check-in, ele é novo e sem atividades.
+    # Mostra a mensagem de "boas-vindas" do Cenário 3.
     if not primeiro_checkin:
-        mensagem = "Resumo semanal disponível por uma semana, após adicionar anotações"
+        mensagem = "Seu resumo semanal aparecerá aqui! Comece a adicionar anotações para ver seu progresso."
         return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
 
+    # Se chegou aqui, o usuário tem pelo menos 1 check-in.
+    # Vamos buscar as atividades da semana.
     semana_inicio = hoje - timedelta(days=hoje.weekday())
     semana_fim = semana_inicio + timedelta(days=6)
 
@@ -131,10 +135,23 @@ def resumo_semanal_view(request):
         data_criacao__date__range=(semana_inicio, semana_fim)
     )
 
+    # Verifica se as 3 buscas não trouxeram resultados
     if not interesses_novos.exists() and not maior_interesse and not anotacoes_semana.exists():
-        mensagem = "Nenhuma novidade nesta semana"
+        
+        # OK, está vazio. Mas por quê?
+        # Calculamos os dias de uso para decidir qual mensagem mostrar.
+        dias_de_uso = (hoje - primeiro_checkin.data_checkin).days
+        
+        if dias_de_uso < 7:
+            # Cenário 3 (Novo): Usuário novo, mas sem atividades *esta semana*
+            mensagem = "Seu resumo semanal aparecerá aqui! Comece a adicionar anotações para ver seu progresso."
+        else:
+            # Cenário 2: Usuário antigo, mas sem atividades *esta semana*
+            mensagem = "Nenhuma novidade nesta semana."
+        
         return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
 
+    # Cenário 1: O usuário tem atividades! Mostra o resumo completo.
     return render(request, 'noticias/resumo_semanal.html', {
         "interesses_novos": interesses_novos,
         "maior_interesse": maior_interesse,
@@ -236,6 +253,9 @@ def settings_view(request):
 # -----------------------------
 # INTERESSES
 # -----------------------------
+# No seu arquivo views.py
+
+@login_required 
 def gerenciar_interesses(request):
     if not request.user.is_authenticated:
         messages.error(request, 'Você precisa estar logado para gerenciar interesses.')
@@ -246,19 +266,39 @@ def gerenciar_interesses(request):
         target_frequency = request.POST.get('target_frequency')
 
         if name:
-            interest, created = Interest.objects.get_or_create(user=request.user, name=name)
-            messages.success(request, f'Interesse "{name}" adicionado!')
+            # 1. Busca ou cria o Interesse
+            interest, interest_created = Interest.objects.get_or_create(user=request.user, name=name)
+            
+            if interest_created:
+                messages.success(request, f'Interesse "{name}" adicionado!')
+            # (Opcional: adicione um else para dizer "Interesse já existe")
 
+            # 2. Verifica se uma meta foi definida
             if target_frequency and target_frequency.isdigit():
                 week_start = Goal.get_start_of_week()
-                Goal.objects.create(
+                
+                # --- AQUI ESTÁ A CORREÇÃO ---
+                # Em vez de .create(), usamos .update_or_create()
+                goal, goal_created = Goal.objects.update_or_create(
+                    # Campos para BUSCAR:
                     user=request.user,
                     interest=interest,
-                    targetFrequency=int(target_frequency),
-                    currentProgress=0,
-                    weekStartDate=week_start
+                    weekStartDate=week_start,
+                    
+                    # Campos para ATUALIZAR ou CRIAR:
+                    defaults={
+                        'targetFrequency': int(target_frequency)
+                        # Nota: Se a meta for nova, 'currentProgress' 
+                        # usará o valor default (0). Se for atualização,
+                        # o progresso atual será mantido.
+                    }
                 )
-                messages.success(request, f'Meta semanal criada: {target_frequency} leituras.')
+                # --- FIM DA CORREÇÃO ---
+
+                if goal_created:
+                    messages.success(request, f'Meta semanal criada: {target_frequency} leituras.')
+                else:
+                    messages.success(request, f'Meta semanal atualizada para: {target_frequency} leituras.')
 
             return redirect('pagina_de_interesses')
 
