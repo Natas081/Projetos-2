@@ -105,53 +105,36 @@ def routine_view(request):
 @login_required
 def resumo_semanal_view(request):
     perfil = getattr(request.user, 'perfil', None)
-    hoje = timezone.localdate() # Usa o timezone do Django
+    hoje = timezone.localdate()
 
-    # Checa se o usuário tem pelo menos 7 dias de uso
     primeiro_checkin = CheckIn.objects.filter(usuario=request.user).order_by('data_checkin').first()
     
     if not primeiro_checkin:
-        # Se NUNCA fez checkin, mostra a mensagem
-        mensagem = "Resumo semanal disponível por uma semana, ao adicionar anotações"
+        mensagem = "Resumo semanal disponível por uma semana, após adicionar anotações"
         return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
 
-    # ★ CORREÇÃO LÓGICA ★
-    # Compara a data do primeiro checkin (ignorando a hora) com hoje
-    dias_de_uso = (hoje - primeiro_checkin.data_checkin).days
-    
-    if dias_de_uso < 7:
-        # Cenário 3
-        mensagem = "Resumo semanal disponível após 7 dias de uso"
-        return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
-
-    # Se chegou aqui, tem 7+ dias. Continua para a lógica da semana.
     semana_inicio = hoje - timedelta(days=hoje.weekday())
     semana_fim = semana_inicio + timedelta(days=6)
 
-    # Interesses registrados na semana (Goals criados na semana)
     interesses_novos = Interest.objects.filter(
         user=request.user, 
         goals__weekStartDate=semana_inicio
     ).distinct()
 
-    # Assunto mais visto
     maior_interesse = Goal.objects.filter(
         user=request.user, 
         weekStartDate=semana_inicio
     ).order_by('-currentProgress').first()
 
-    # Anotações do diário da semana
     anotacoes_semana = DiarioEntry.objects.filter(
         usuario=request.user,
         data_criacao__date__range=(semana_inicio, semana_fim)
     )
 
-    # Cenário 2
     if not interesses_novos.exists() and not maior_interesse and not anotacoes_semana.exists():
         mensagem = "Nenhuma novidade nesta semana"
         return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
 
-    # Cenário 1
     return render(request, 'noticias/resumo_semanal.html', {
         "interesses_novos": interesses_novos,
         "maior_interesse": maior_interesse,
