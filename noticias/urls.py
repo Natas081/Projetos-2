@@ -13,6 +13,7 @@ urlpatterns = [
     # Interesses
     path('interesses/', views.gerenciar_interesses, name='pagina_de_interesses'),
     path('interesses/<int:interest_id>/delete/', views.delete_interest_view, name='delete_interest'),
+    path('interesses/<int:interest_id>/edit/', views.edit_interest_view, name='edit_interest'),
 
     # Diário do Aprendizado
     path('diario/', views.diario_view, name='diario'),

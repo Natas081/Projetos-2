@@ -112,7 +112,7 @@ def resumo_semanal_view(request):
     
     if not primeiro_checkin:
         # Se NUNCA fez checkin, mostra a mensagem
-        mensagem = "Resumo semanal disponível após 7 dias de uso"
+        mensagem = "Resumo semanal disponível por uma semana, ao adicionar anotações"
         return render(request, 'noticias/resumo_semanal.html', {"mensagem": mensagem, "perfil": perfil})
 
     # ★ CORREÇÃO LÓGICA ★
@@ -288,7 +288,88 @@ def delete_interest_view(request, interest_id):
     if request.method == 'POST':
         interest.delete()
         messages.success(request, "Interesse deletado com sucesso!")
-    return redirect('pagina_de_interesses')
+    return redirect('routine')
+
+# (Cole isso no seu views.py)
+
+@login_required
+def edit_interest_view(request, interest_id):
+    # 1. Busca o interesse específico daquele usuário
+    interest = get_object_or_404(Interest, id=interest_id, user=request.user)
+    
+    # 2. Busca a meta DESTA semana (pode ser None)
+    week_start = Goal.get_start_of_week()
+    goal = Goal.objects.filter(
+        user=request.user, 
+        interest=interest, 
+        weekStartDate=week_start
+    ).first()
+
+    if request.method == 'POST':
+        # 3. Pega os dados do formulário
+        new_name = request.POST.get('name')
+        new_target_frequency_str = request.POST.get('target_frequency')
+
+        # 4. Valida o nome
+        if not new_name or new_name.strip() == "":
+            messages.error(request, "O nome do interesse não pode ficar em branco.")
+            # Se der erro, re-renderiza a página com os dados atuais
+            return render(request, 'noticias/edit_interest.html', {
+                'interest': interest,
+                'goal': goal
+            })
+        
+        # Salva o novo nome do interesse
+        interest.name = new_name.strip()
+        interest.save()
+
+        # 5. Valida e salva a Meta
+        try:
+            # Converte a frequência (se for vazia, vira 0)
+            new_target_frequency = int(new_target_frequency_str) if new_target_frequency_str else 0
+        except ValueError:
+            messages.error(request, "A frequência deve ser um número.")
+            return render(request, 'noticias/edit_interest.html', {
+                'interest': interest,
+                'goal': goal
+            })
+
+        if new_target_frequency > 0:
+            # Se o usuário quer uma meta (criar ou atualizar)
+            if goal:
+                # Meta já existe? Atualiza
+                goal.targetFrequency = new_target_frequency
+                goal.save()
+                messages.success(request, f'Interesse "{interest.name}" e meta atualizados.')
+            else:
+                # Meta não existe? Cria
+                Goal.objects.create(
+                    user=request.user,
+                    interest=interest,
+                    targetFrequency=new_target_frequency,
+                    currentProgress=0,
+                    weekStartDate=week_start
+                )
+                messages.success(request, f'Interesse "{interest.name}" atualizado e meta criada.')
+        
+        elif new_target_frequency <= 0 and goal:
+            # Se a meta é 0 e ela existia, delete
+            goal.delete()
+            messages.info(request, f'Interesse "{interest.name}" atualizado e meta da semana removida.')
+        
+        else:
+            # Se a meta é 0 e não existia, só confirma a mudança do nome
+            messages.success(request, f'Interesse "{interest.name}" atualizado.')
+
+        # 6. Redireciona de volta para a Rotina
+        return redirect('routine')
+
+    # 7. (GET) Mostra a página de edição pela primeira vez
+    context = {
+        'interest': interest,
+        'goal': goal # Passa a meta (ou None) para preencher o form
+    }
+    return render(request, 'noticias/edit_interest.html', context)
 
 @login_required
 def streak_page(request):
