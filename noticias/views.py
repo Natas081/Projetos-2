@@ -488,3 +488,105 @@ def streak_page(request):
         'perfil': perfil,
         'ja_fez_checkin_hoje': ja_fez_checkin_hoje,
     })
+
+@login_required
+def calendario_leitura_view(request, ano=None, mes=None):
+    """
+    Exibe um calendário mensal com o registro de check-ins e anotações do usuário.
+    Atende aos cenários: Verde (Check-in), Cinza (Sem Check-in), Azul (Dia Atual),
+    e marca a presença de anotações.
+    """
+    
+    # 1. Definir o Mês/Ano a ser exibido
+    hoje = timezone.localdate()
+    
+    if ano is None or mes is None:
+        # Se 'ano' e 'mes' não foram passados, usa o mês atual
+        mes = hoje.month
+        ano = hoje.year
+
+    try:
+        # Garante que os valores sejam inteiros
+        ano = int(ano)
+        mes = int(mes)
+        # Cria a data inicial do calendário para o primeiro dia do mês/ano
+        data_referencia = date(ano, mes, 1)
+    except ValueError:
+        # Lidar com datas inválidas (ex: mês 13 ou URL malformada)
+        messages.error(request, "Data inválida para o calendário.")
+        return redirect('calendario_leitura_atual') # Redireciona para o calendário atual
+        
+    # Calcular o último dia do mês
+    if mes == 12:
+        proximo_mes_data = date(ano + 1, 1, 1)
+    else:
+        proximo_mes_data = date(ano, mes + 1, 1)
+        
+    # data_final é o dia anterior ao primeiro dia do próximo mês
+    data_final = proximo_mes_data - timedelta(days=1)
+    
+    # 2. Buscar Dados do Usuário
+    
+    # Buscar todos os Check-Ins (para cor Verde/Cinza)
+    checkins_no_mes = CheckIn.objects.filter(
+        usuario=request.user,
+        data_checkin__gte=data_referencia,
+        data_checkin__lte=data_final
+    ).values_list('data_checkin', flat=True)
+    
+    # Buscar todas as Anotações (para marcação de anotações)
+    anotacoes_no_mes = DiarioEntry.objects.filter(
+        usuario=request.user,
+        data_criacao__date__gte=data_referencia,
+        data_criacao__date__lte=data_final
+    ).values_list('data_criacao__date', flat=True).distinct()
+    
+    # Usamos sets para buscas rápidas (O(1))
+    checkins_set = set(checkins_no_mes)
+    anotacoes_set = set(anotacoes_no_mes)
+    
+    # 3. Montar a Estrutura do Calendário
+    dias_do_mes = []
+    
+    for dia_num in range(1, data_final.day + 1):
+        data_atual = date(ano, mes, dia_num)
+        
+        # Mapeamento dos Cenários:
+        if data_atual == hoje:
+            cor = 'azul' 
+        elif data_atual in checkins_set:
+            cor = 'verde' 
+        elif data_atual < hoje:
+            cor = 'cinza' 
+        else:
+            cor = 'neutro' 
+
+        tem_anotacao = data_atual in anotacoes_set
+
+        dias_do_mes.append({
+            'dia': dia_num,
+            'data': data_atual,
+            'cor': cor,
+            'tem_anotacao': tem_anotacao,
+        })
+    
+    # 4. Contexto para o Template
+    
+    # Lógica de navegação de Mês (corrigida)
+    mes_anterior_data = data_referencia - timedelta(days=1)
+    
+    context = {
+        'dias_do_mes': dias_do_mes,
+        'mes_nome': data_referencia.strftime('%B %Y').capitalize(),
+        'hoje': hoje,
+        
+        # --- CORREÇÃO PRINCIPAL ---
+        # Enviar ano e mês separados para a URL, em vez de uma string
+        'mes_anterior_ano': mes_anterior_data.year,
+        'mes_anterior_mes': mes_anterior_data.month,
+        'proximo_mes_ano': proximo_mes_data.year,
+        'proximo_mes_mes': proximo_mes_data.month,
+    }
+
+    # Renderiza o template 'calendario.html'
+    return render(request, 'noticias/calendario.html', context)

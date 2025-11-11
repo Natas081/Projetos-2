@@ -7,10 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .nav-link {
-            @apply px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-md transition;
+        body { 
+            font-family: 'Inter', sans-serif; 
         }
+        /* A classe .nav-link foi removida daqui e suas propriedades aplicadas diretamente nos links (<a>) 
+           para garantir que o estilo de botão sólido funcione corretamente. */
     </style>
 </head>
 <body class="flex h-full">
@@ -18,72 +19,62 @@
     {% load static user_extras %}
 
 
+    <aside class="flex flex-col w-64 h-screen bg-white border-r border-gray-200 p-6">
+        <a href="{% url 'home' %}" class="block mb-6">
+            <img src="{% static 'logo/meujornal1.png' %}" alt="MeuJornal" class="h-12 w-auto">
+        </a>
 
-    <!-- MENU LATERAL -->
-<aside class="flex flex-col w-64 h-screen bg-white border-r border-gray-200 p-6">
-  <!-- Logo -->
-  <a href="{% url 'home' %}" class="block mb-6">
-    <img src="{% static 'logo/meujornal1.png' %}" alt="MeuJornal" class="h-12 w-auto">
-  </a>
+        {% if user.is_authenticated %}
+            <nav class="flex flex-col gap-3">
+                <a href="{% url 'pagina_de_interesses' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Interesses</a>
+                <a href="{% url 'routine' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Rotina</a>
+                <a href="{% url 'calendario_leitura_atual' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Calendário</a>
+                <a href="{% url 'diario' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Diário</a>
+                <a href="{% url 'resumo_semanal' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Resumo Semanal</a>
+            </nav>
 
-  {% if user.is_authenticated %}
-    <!-- Navegação -->
-    <nav class="flex flex-col gap-3">
-      <a href="{% url 'pagina_de_interesses' %}" class="nav-link">Interesses</a>
-      <a href="{% url 'routine' %}" class="nav-link">Rotina</a>
-      <a href="{% url 'diario' %}" class="nav-link">Diário</a>
-      <a href="{% url 'resumo_semanal' %}" class="nav-link">Resumo Semanal</a>
-      {# REMOVIDO: Configurações do menu principal #}
-    </nav>
+            <div class="mt-auto"></div>
 
-    <!-- empurra o cartão do usuário para o rodapé da sidebar -->
-    <div class="mt-auto"></div>
-
-    <!-- Cartão do usuário (rodapé da sidebar) -->
-    <a href="{% url 'settings' %}"
-       class="group flex items-center gap-3 p-3 mt-6 rounded-xl border border-gray-200 hover:bg-gray-50 transition">
-      <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-        {% if avatar_url %}
-          <img src="{{ avatar_url }}" alt="{{ display_name }}" class="h-full w-full object-cover">
+            <a href="{% url 'settings' %}"
+                class="group flex items-center gap-3 p-3 mt-6 rounded-xl border border-gray-200 hover:bg-gray-50 transition">
+                <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+                    {% if avatar_url %}
+                        <img src="{{ avatar_url }}" alt="{{ display_name }}" class="h-full w-full object-cover">
+                    {% else %}
+                        <span class="text-sm font-semibold text-gray-700">
+                            {{ display_name|initials_from_name }}
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 truncate">{{ display_name }}</p>
+                    <p class="text-xs text-gray-500 truncate">@{{ user.username }}</p>
+                </div>
+                <svg class="ml-auto h-4 w-4 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707A1 1 0 118.707 5.293l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                </svg>
+            </a>
         {% else %}
-          <span class="text-sm font-semibold text-gray-700">
-            {{ display_name|initials_from_name }}
-          </span>
+            <nav class="flex flex-col gap-3">
+                <a href="{% url 'login' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Entrar</a>
+                <a href="{% url 'registro' %}" class="ml-0 mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">Cadastrar</a>
+            </nav>
         {% endif %}
-      </div>
-      <div class="min-w-0">
-        <p class="text-sm font-semibold text-gray-900 truncate">{{ display_name }}</p>
-        <p class="text-xs text-gray-500 truncate">@{{ user.username }}</p>
-      </div>
-      <svg class="ml-auto h-4 w-4 text-gray-400 group-hover:text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707A1 1 0 118.707 5.293l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-      </svg>
-    </a>
-  {% else %}
-    <nav class="flex flex-col gap-3">
-      <a href="{% url 'login' %}" class="nav-link">Entrar</a>
-      <a href="{% url 'registro' %}" class="ml-0 mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">Cadastrar</a>
-    </nav>
-  {% endif %}
-</aside>
+    </aside>
 
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div class="flex-grow flex flex-col min-h-screen">
 
-        <!-- NAVBAR TOPO (opcional, pode remover se quiser só lateral) -->
         <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
                     <span class="text-lg font-semibold text-gray-700">
-                        <!-- Pode colocar título da página dinamicamente -->
                         {% block page_title %}{% endblock %}
                     </span>
                 </div>
             </div>
         </nav>
 
-        <!-- Mensagens -->
         {% if messages %}
         <div class="max-w-3xl mx-auto mt-6 px-4">
             {% for message in messages %}
@@ -94,12 +85,10 @@
         </div>
         {% endif %}
 
-        <!-- Conteúdo principal -->
         <main class="flex-grow py-10 px-6 sm:px-8 lg:px-10">
             {% block content %}{% endblock %}
         </main>
 
-        <!-- Rodapé -->
         <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
             <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
                 © 2025 <span class="font-semibold text-red-600">MeuJornal</span> — Todos os direitos reservados.
@@ -107,7 +96,6 @@
         </footer>
     </div>
 
-    <!-- Widget fixo do Streak -->
     {% if user.is_authenticated and perfil %}
     <div class="fixed bottom-6 right-6 bg-white border border-gray-200 shadow-xl rounded-2xl px-5 py-4 z-50">
         <p class="text-sm text-gray-600">🔥 Seu streak:</p>

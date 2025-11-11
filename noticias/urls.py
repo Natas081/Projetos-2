@@ -23,6 +23,8 @@ urlpatterns = [
 
     # Rotina (METAS SEMANAIS)
     path('routine/', views.routine_view, name='routine'),
+    path('routine/calendario/', views.calendario_leitura_view, name='calendario_leitura_atual'),
+    path('routine/calendario/<int:ano>/<int:mes>/', views.calendario_leitura_view, name='calendario_leitura_mes'),
 
     # Streak
     path('streak/', views.streak_page, name='streak'),
