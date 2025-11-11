@@ -8,7 +8,7 @@ import dj_database_url
 
 # -------------------- DIRETÓRIO BASE --------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+# .
 # -------------------- CHAVE SECRETA --------------------
 SECRET_KEY = os.environ.get(
     'SECRET_KEY',
