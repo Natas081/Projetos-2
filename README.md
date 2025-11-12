@@ -152,7 +152,9 @@ Repositório para o projeto.
   </details>
 
    <details>   <summary>- ✅ Semana 17 </summary>      
-   
+
+   * Implementação de mais uma história de usuário
+     
    * CONTRIBUTING.md
    
    * Criação dos usuarios pros avaliadores
