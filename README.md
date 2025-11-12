@@ -119,6 +119,43 @@ Repositório para o projeto.
 
    
 
+   
+
+
+     
+   * Acompanhamento de bugs (bugtrackers).    </details>
+
+   <details>   <summary>- ✅ Semana 15 </summary> 
+
+   * Implementação de mais uma história de usuário. 
+   
+   * Continuação de testes automatizados.
+
+   * Bug Tracker.
+
+   * Relatorio programação em Par:
+   https://docs.google.com/document/d/11WXcPX00AKIrWfLhS0i9SHFdagwCuKa0PvGunSQRU10/edit?usp=sharing
+
+</details>
+ <details>   <summary>- ✅ Semana 16 </summary>      
+   
+   * Implementação de mais uma história de usuário 
+   
+   * Continuação dos testes automatizados.
+
+   * Bug Tracker.
+     
+   * Acompanhamento de bugs (bugtrackers).
+   * Screencasts:
+  </details>
+
+   <details>   <summary>- ✅ Semana 17 </summary>      
+   
+   * CONTRIBUTING.md
+   
+   * Criação dos usuarios pros avaliadores
+
+   * Bug Tracker.
 
      
    * Acompanhamento de bugs (bugtrackers).    </details>
