@@ -136,9 +136,8 @@ Repositório para o projeto.
 
    * Bug Tracker.
 
-   * Relatorio programação em Par:
-   https://docs.google.com/document/d/11WXcPX00AKIrWfLhS0i9SHFdagwCuKa0PvGunSQRU10/edit?usp=sharing
-
+   * [Relatorio programação em Par] (https://docs.google.com/document/d/11WXcPX00AKIrWfLhS0i9SHFdagwCuKa0PvGunSQRU10/edit?usp=sharing)
+   
 </details>
  <details>   <summary>- ✅ Semana 16 </summary>      
    
