@@ -20,16 +20,16 @@ Repositório para o projeto.
 - **Guilherme Silvestre** – [lgsgs@cesar.school](mailto:lgsgs@cesar.school)  
     *DevOps – Time de Desenvolvimento*  
 
-- **Natan** – [nlps@cesar.school](mailto:nlps@cesar.school)  
+- **Natan Luis** – [nlps@cesar.school](mailto:nlps@cesar.school)  
     *Teach Lead – Time de Desenvolvimento*
    
-- **Manuella** – [msn4@cesar.school](mailto:msn4@cesar.school)  
+- **Manuella Souto** – [msn4@cesar.school](mailto:msn4@cesar.school)  
     *UI/UX Designer – Time de Experiência e Interface*
    
-- **Pablo** – [pcgar@cesar.school](mailto:pcgar@cesar.school)  
+- **Pablo Coelho** – [pcgar@cesar.school](mailto:pcgar@cesar.school)  
     *Engenheiro de QA – Time de Desenvolvimento*  
 
-- **Ranilton Junior** – [rasrj@cesar.school](mailto:rasrj@cesar.school)  
+- **Ranilton Júnior** – [rasrj@cesar.school](mailto:rasrj@cesar.school)  
     *Engenheiro de QA – Time de Desenvolvimento*  
     
 ---
