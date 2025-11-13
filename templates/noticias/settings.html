@@ -83,12 +83,12 @@
 
           <div class="pt-1">
             <p class="text-sm text-gray-600 mb-2">Avatar atual:</p>
-            <div class="h-20 w-20 rounded-full border-2 border-red-300 overflow-hidden flex items-center justify-center">
-              {% if perfil and perfil.avatar %}
-                <img src="{{ perfil.avatar.url }}" alt="Avatar" class="h-full w-full object-cover">
+            <div class="h-16 w-16 rounded-full border border-red-400 flex items-center justify-center overflow-hidden">
+              {% if user.userprofile.avatar %}
+                <img src="{{ user.userprofile.avatar.url }}" alt="{{ display_name }}" class="h-full w-full object-cover">
               {% else %}
                 <span class="text-lg font-semibold text-gray-600">
-                  {{ perfil.display_name|default:user.username|initials_from_name }}
+                  {{ display_name|initials_from_name }}
                 </span>
               {% endif %}
             </div>

@@ -38,8 +38,10 @@
             <a href="{% url 'settings' %}"
                 class="group flex items-center gap-3 p-3 mt-6 rounded-xl border border-gray-200 hover:bg-gray-50 transition">
                 <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                    {% if avatar_url %}
-                        <img src="{{ avatar_url }}" alt="{{ display_name }}" class="h-full w-full object-cover">
+                    {% if user.is_authenticated and user.userprofile.avatar %}
+                        <img src="{{ user.userprofile.avatar.url }}"
+                             alt="{{ display_name }}"
+                             class="h-full w-full object-cover">
                     {% else %}
                         <span class="text-sm font-semibold text-gray-700">
                             {{ display_name|initials_from_name }}
