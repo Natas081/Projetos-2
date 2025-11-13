@@ -10,8 +10,7 @@
         body { 
             font-family: 'Inter', sans-serif; 
         }
-        /* A classe .nav-link foi removida daqui e suas propriedades aplicadas diretamente nos links (<a>) 
-           para garantir que o estilo de botão sólido funcione corretamente. */
+        
     </style>
 </head>
 <body class="flex h-full">
@@ -26,7 +25,7 @@
 
         {% if user.is_authenticated %}
             <nav class="flex flex-col gap-3">
-                <a href="{% url 'pagina_de_interesses' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Interesses</a>
+                <a href="{% url 'pagina_de_interesses' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Interesses extras</a>
                 <a href="{% url 'routine' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Rotina</a>
                 <a href="{% url 'calendario_leitura_atual' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Calendário</a>
                 <a href="{% url 'diario' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Diário</a>
