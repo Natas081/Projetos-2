@@ -13,27 +13,32 @@ from django.utils import timezone
 @login_required 
 def home(request):
     perfil = getattr(request.user, 'perfil', None)
-    profile = getattr(request.user, 'userprofile', None)
+    # Garante que o UserProfile exista
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-    if not profile:
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)
-
-    # 1. Pega os temas que o usuário salvou no perfil
     temas_salvos = profile.categorias_seguidas.all()
+    noticias = Noticia.objects.none() # Começa com uma lista vazia
 
-    # 2. Se o usuário NÃO salvou nenhum tema ainda...
     if not temas_salvos.exists():
-        # ...manda ele para a página de "Opções" para escolher
+        # Cenário 2: Não tem interesses
+        # (Mantém a lista 'noticias' vazia e exibe a mensagem de boas-vindas)
         messages.info(request, "Bem-vindo! Por favor, escolha seus temas de interesse para começar.")
-        return redirect('gerenciar_temas') 
+    else:
+        # 3. SE ELE JÁ SALVOU TEMAS:
+        #    Filtra as notícias normais do feed
+        noticias = Noticia.objects.filter(categoria__in=temas_salvos).order_by('-id')
     
-    # 3. SE ELE JÁ SALVOU TEMAS:
-    #    Esta é a parte que filtra e remove o limite de 5
-    noticias = Noticia.objects.filter(categoria__in=temas_salvos).order_by('-id')
+    # --- LÓGICA DA SUGESTÃO DO DIA ---
+    # Chamamos o método que criamos no models.py
+    sugestao, sugestao_msg = profile.get_ou_gerar_sugestao_do_dia()
+    # --- FIM DA LÓGICA ---
     
     return render(request, 'noticias/home.html', {
-        "noticias": noticias, 
-        "perfil": perfil
+        "noticias": noticias, # (Estará vazio se não houver temas)
+        "perfil": perfil,
+        "temas_salvos": temas_salvos, # Útil para o template
+        "sugestao_do_dia": sugestao,     # A Noticia (ou None)
+        "sugestao_mensagem": sugestao_msg # A Mensagem (ou None)
     })
 
 @login_required
