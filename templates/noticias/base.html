@@ -5,24 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MeuJornal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        #sidebar h2 { 
+            cursor: pointer; 
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body class="h-full">
 {% load user_extras %}
 {% load static user_extras %}
 
-<nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+<nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16 relative">
-            <button id="menuBtn" class="absolute left-4 p-2 rounded-md">
+            <button id="menuBtn" class="absolute left-4 top-4 p-2 rounded-md z-50">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#dc2626" class="w-7 h-7 text-gray-700">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
             </button>
-
             <div class="flex justify-center w-full">
                 <a href="{% url 'home' %}" class="pointer-events-auto">
                     <img src="{% static 'logo/meujornal1.png' %}" alt="MeuJornal" class="h-12 w-auto">
@@ -34,7 +38,9 @@
 
 <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-black border-r border-gray-200 p-6 shadow-2xl -translate-x-full transition-transform duration-300 z-50 flex flex-col">
     {% if user.is_authenticated %}
-        <h2 class="text-red-600 text-3xl font-bold tracking-tight mb-4 ml-1" style="font-family: 'Inter', sans-serif;">MENU</h2>
+        <h2 id="sidebarMenuBtn" class="text-red-600 text-3xl font-bold tracking-tight mb-4 text-center cursor-pointer" style="font-family: 'Montserrat', sans-serif;">
+            MENU
+        </h2>
         <nav class="flex flex-col gap-4 mt-10">
             <a href="{% url 'pagina_de_interesses' %}" class="flex items-center rounded-xl overflow-hidden shadow bg-red-600 hover:bg-red-700 transition">
                 <div class="w-14 h-full bg-red-700 flex items-center justify-center">
@@ -109,11 +115,15 @@
 
 <script>
     const menuBtn = document.getElementById('menuBtn');
+    const sidebarMenuBtn = document.getElementById('sidebarMenuBtn');
     const sidebar = document.getElementById('sidebar');
 
-    menuBtn.addEventListener('click', () => {
+    function toggleSidebar() {
         sidebar.classList.toggle('-translate-x-full');
-    });
+    }
+
+    menuBtn.addEventListener('click', toggleSidebar);
+    sidebarMenuBtn.addEventListener('click', toggleSidebar);
 </script>
 
 <div class="pt-6 px-6">
