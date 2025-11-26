@@ -1,6 +1,6 @@
 # MeuJornal
 
-Repositório para o projeto.
+Repositório para projetos 2. 
 
 ---
 ## Time  
