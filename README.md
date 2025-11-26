@@ -149,6 +149,7 @@ Repositório para projetos 2.
      
    * Acompanhamento de bugs (bugtrackers).
    * Screencasts:
+   * * [CI/CD]()
   </details>
 
    <details>   <summary>- ✅ Semana 17 </summary>      
