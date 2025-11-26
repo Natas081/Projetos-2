@@ -148,7 +148,7 @@ Repositório para projetos 2.
    * Bug Tracker.
      
    * Acompanhamento de bugs (bugtrackers).
-   * Screencasts:
+     Screencasts:
    * [CI/CD](https://www.youtube.com/watch?v=H4mCkHFV4WY)
    * [Testes automatizados](https://www.youtube.com/watch?v=3y_XCKNwjdo)
   </details>
