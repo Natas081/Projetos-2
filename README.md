@@ -161,6 +161,9 @@ Repositório para projetos 2.
    
    * Criação dos usuarios pros avaliadores
 
+   * login avaliador: avaliador1
+   * senha avaliador: avaliador01
+
    * Bug Tracker.
 
      
