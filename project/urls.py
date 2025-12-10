@@ -8,7 +8,6 @@ from django.conf.urls.static import static
 # Importa as 'views' de autenticação do Django
 from django.contrib.auth import views as auth_views
 # Importa seu formulário personalizado do 'noticias'
-from noticias.forms import CustomPasswordChangeForm
 # ---------------------
 
 urlpatterns = [
