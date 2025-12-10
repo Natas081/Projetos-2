@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django import forms
+
 
 User = get_user_model()
 
