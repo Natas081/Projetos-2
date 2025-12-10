@@ -6,6 +6,10 @@ from datetime import date, timedelta
 from .models import Interest, Noticia, Perfil, CheckIn, Goal, DiarioEntry, UserProfile, Categoria
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.contrib.auth import get_user_model, update_session_auth_hash
+
+User = get_user_model()
+
 # -----------------------------
 # PÁGINAS PRINCIPAIS
 # -----------------------------
@@ -262,53 +266,68 @@ def logout_usuario(request):
 # PROFILE UPDATE
 # -----------------------------
 
+
 @login_required
 def settings_view(request):
-    # Garante que o perfil exista (evita DoesNotExist -> 500)
+    # garante que o perfil exista
     perfil, _ = UserProfile.objects.get_or_create(user=request.user)
 
-    # Inicializa forms "não bindados" por padrão
-    pform = ProfileForm(instance=perfil)
-    uform = UsernameChangeForm(request.user)
-
     if request.method == "POST":
-        # Salvar PERFIL (display_name + avatar)
+        # 1) Atualizar perfil (nome de exibição + avatar)
         if "save_profile" in request.POST:
-            pform = ProfileForm(request.POST, request.FILES, instance=perfil)
-            if pform.is_valid():
-                pform.save()
-                messages.success(request, "Perfil atualizado com sucesso!")
-                return redirect("settings")
+            display_name = request.POST.get("display_name", "").strip()
+            avatar = request.FILES.get("avatar")
 
-        # Salvar USERNAME (trocar usuário de login)
-        elif "save_username" in request.POST:
-            uform = UsernameChangeForm(request.user, request.POST)
-            if uform.is_valid():
-                uform.save()
+            if display_name:
+                perfil.display_name = display_name
+            else:
+                # se quiser permitir vazio, pode só não mexer
+                perfil.display_name = ""
+
+            if avatar:
+                perfil.avatar = avatar
+
+            perfil.save()
+            messages.success(request, "Perfil atualizado com sucesso!")
+            return redirect("settings")
+
+        # 2) Alterar username (login)
+        if "save_username" in request.POST:
+            new_username = request.POST.get("username", "").strip()
+            current_password = request.POST.get("current_password", "")
+
+            # validações que antes estavam no UsernameChangeForm
+            if not current_password:
+                messages.error(request, "Informe sua senha atual.")
+            elif not request.user.check_password(current_password):
+                messages.error(request, "Senha atual incorreta.")
+            elif not new_username:
+                messages.error(request, "Informe um novo usuário.")
+            elif new_username.lower() == request.user.username.lower():
+                messages.error(request, "Esse já é o seu usuário atual.")
+            elif User.objects.filter(username__iexact=new_username).exclude(pk=request.user.pk).exists():
+                messages.error(request, "Este usuário já está em uso.")
+            else:
+                request.user.username = new_username
+                request.user.save(update_fields=["username"])
                 messages.success(request, "Usuário alterado com sucesso!")
                 return redirect("settings")
 
-        # Outros POSTs caem aqui e só re-renderizam com os forms atuais
-
-    # Monta avatar_url com segurança (evita .url sem arquivo)
-    avatar_url = None
-    try:
-        if getattr(perfil, "avatar", None) and getattr(perfil.avatar, "name", ""):
-            avatar_url = perfil.avatar.url
-    except Exception:
-        avatar_url = None
-
-    # Fallback do nome de exibição
-    display_name = (perfil.display_name or request.user.get_username()).strip()
+    # GET normal ou POST com erro → montar contexto
+    avatar_url = (
+        perfil.avatar.url
+        if getattr(perfil, "avatar", None) and getattr(perfil.avatar, "name", "")
+        else None
+    )
+    display_name = perfil.display_name or request.user.get_username()
 
     context = {
-        "pform": pform,
-        "uform": uform,
+        "perfil": perfil,
         "avatar_url": avatar_url,
         "display_name": display_name,
     }
     return render(request, "noticias/settings.html", context)
-
+    
 
 # -----------------------------
 # INTERESSES
