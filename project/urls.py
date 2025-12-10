@@ -24,8 +24,7 @@ urlpatterns = [
         auth_views.PasswordChangeView.as_view(
             # Aponta para seu template
             template_name="noticias/auth/password_change.html",
-            # Usa seu form com CSS
-            form_class=CustomPasswordChangeForm               
+                          
         ), 
         name='password_change'
     ),
