@@ -8,216 +8,162 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        #sidebar h2 {
-            cursor: pointer;
+        #sidebar h2 { 
+            cursor: pointer; 
             font-family: 'Montserrat', sans-serif;
             font-weight: 700;
         }
     </style>
 </head>
-<body class="h-full">
-{% load static user_extras %}
+<body class="h-full bg-gray-50">
+{% load static %}
+{% load user_extras %}
 
-<!-- NAV TOPO -->
+{# NAV SUPERIOR COM LOGO E HAMBÚRGUER #}
 <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 relative">
-            <!-- BOTÃO HAMBÚRGUER - TOTALMENTE À ESQUERDA -->
-            <button
-                id="menuBtn"
-                type="button"
-                class="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-md
-                       md:hidden"  <!-- some em telas grandes -->
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                     viewBox="0 0 24 24" stroke-width="1.8" stroke="#dc2626"
-                     class="w-7 h-7">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        <div class="flex justify-between items-center h-16 relative">
+
+            {# BOTÃO HAMBÚRGUER — FICA FIXO NO CANTO ESQUERDO #}
+            <button id="menuBtn" class="absolute left-4 top-4 p-2 rounded-md z-50">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#dc2626" class="w-7 h-7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
             </button>
 
-            <!-- LOGO CENTRALIZADA -->
+            {# LOGO CENTRAL #}
             <div class="flex justify-center w-full">
                 <a href="{% url 'home' %}" class="pointer-events-auto">
-                    <img src="{% static 'logo/meujornal1.png' %}"
-                         alt="MeuJornal"
-                         class="h-12 w-auto">
+                    <img src="{% static 'logo/meujornal1.png' %}" alt="MeuJornal" class="h-12 w-auto">
                 </a>
             </div>
-
-            <!-- espaçador pra equilibrar o layout no desktop -->
-            <div class="hidden md:block w-11"></div>
         </div>
     </div>
 </nav>
 
-<!-- SIDEBAR (MENU LATERAL) -->
+{# SIDEBAR LATERAL #}
 <aside
     id="sidebar"
-    class="fixed left-0 top-0 h-full w-64 bg-black border-r border-gray-200 p-6
-           shadow-2xl -translate-x-full transition-transform duration-300 z-50
-           flex flex-col"
+    class="fixed left-0 top-0 h-full w-64 bg-black border-r border-gray-200 p-6 shadow-2xl
+           transform -translate-x-full transition-transform duration-300 z-50 flex flex-col"
 >
     {% if user.is_authenticated %}
         <h2 id="sidebarMenuBtn"
-            class="text-red-600 text-3xl font-bold tracking-tight mb-4 text-center">
+            class="text-red-600 text-3xl font-bold tracking-tight mb-4 text-center cursor-pointer"
+            style="font-family: 'Montserrat', sans-serif;">
             MENU
         </h2>
 
         <nav class="flex flex-col gap-4 mt-10">
-            <a href="{% url 'pagina_de_interesses' %}"
-               class="flex items-center rounded-xl overflow-hidden shadow
-                      bg-red-600 hover:bg-red-700 transition">
+            <a href="{% url 'pagina_de_interesses' %}" class="flex items-center rounded-xl overflow-hidden shadow bg-red-600 hover:bg-red-700 transition">
                 <div class="w-14 h-full bg-red-700 flex items-center justify-center">
                     <span class="text-white text-2xl font-bold">+</span>
                 </div>
-                <span class="flex-1 text-center text-white font-semibold py-3">
-                    Interesses Extras
-                </span>
+                <span class="flex-1 text-center text-white font-semibold py-3">Interesses Extras</span>
             </a>
 
-            <a href="{% url 'routine' %}"
-               class="flex items-center rounded-xl overflow-hidden shadow
-                      bg-red-600 hover:bg-red-700 transition">
+            <a href="{% url 'routine' %}" class="flex items-center rounded-xl overflow-hidden shadow bg-red-600 hover:bg-red-700 transition">
                 <div class="w-14 h-full bg-red-700 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke-width="2" stroke="white"
-                         class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 6v6l4 2" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="white" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
                         <circle cx="12" cy="12" r="9" stroke="white" stroke-width="2" />
                     </svg>
                 </div>
-                <span class="flex-1 text-center text-white font-semibold py-3">
-                    Rotina
-                </span>
+                <span class="flex-1 text-center text-white font-semibold py-3">Rotina</span>
             </a>
 
-            <a href="{% url 'calendario_leitura_atual' %}"
-               class="flex items-center rounded-xl overflow-hidden shadow
-                      bg-red-600 hover:bg-red-700 transition">
+            <a href="{% url 'calendario_leitura_atual' %}" class="flex items-center rounded-xl overflow-hidden shadow bg-red-600 hover:bg-red-700 transition">
                 <div class="w-14 h-full bg-red-700 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke-width="2" stroke="white"
-                         class="w-6 h-6">
-                        <rect x="3" y="5" width="18" height="16" rx="2" ry="2"
-                              stroke="white" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="white" class="w-6 h-6">
+                        <rect x="3" y="5" width="18" height="16" rx="2" ry="2" stroke="white" />
                         <line x1="16" y1="3" x2="16" y2="7" stroke="white" />
                         <line x1="8" y1="3" x2="8" y2="7" stroke="white" />
                     </svg>
                 </div>
-                <span class="flex-1 text-center text-white font-semibold py-3">
-                    Calendário
-                </span>
+                <span class="flex-1 text-center text-white font-semibold py-3">Calendário</span>
             </a>
 
-            <a href="{% url 'diario' %}"
-               class="flex items-center rounded-xl overflow-hidden shadow
-                      bg-red-600 hover:bg-red-700 transition">
+            <a href="{% url 'diario' %}" class="flex items-center rounded-xl overflow-hidden shadow bg-red-600 hover:bg-red-700 transition">
                 <div class="w-14 h-full bg-red-700 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke-width="2" stroke="white"
-                         class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M5 4h14v16H5z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="white" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14v16H5z" />
                         <line x1="9" y1="8" x2="15" y2="8" stroke="white" />
                         <line x1="9" y1="12" x2="15" y2="12" stroke="white" />
                     </svg>
                 </div>
-                <span class="flex-1 text-center text-white font-semibold py-3">
-                    Diário
-                </span>
+                <span class="flex-1 text-center text-white font-semibold py-3">Diário</span>
             </a>
 
-            <a href="{% url 'resumo_semanal' %}"
-               class="flex items-center rounded-xl overflow-hidden shadow
-                      bg-red-600 hover:bg-red-700 transition">
+            <a href="{% url 'resumo_semanal' %}" class="flex items-center rounded-xl overflow-hidden shadow bg-red-600 hover:bg-red-700 transition">
                 <div class="w-14 h-full bg-red-700 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke-width="2" stroke="white"
-                         class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M4 4h16v16H4z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="white" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v16H4z" />
                         <line x1="8" y1="10" x2="16" y2="10" stroke="white" />
                         <line x1="8" y1="14" x2="16" y2="14" stroke="white" />
                     </svg>
                 </div>
-                <span class="flex-1 text-center text-white font-semibold py-3">
-                    Resumo Semanal
-                </span>
+                <span class="flex-1 text-center text-white font-semibold py-3">Resumo Semanal</span>
             </a>
         </nav>
 
-        <!-- espaço flex pra jogar o card de usuário lá embaixo -->
-        <div class="mt-auto"></div>
-
-        <!-- CARD DO USUÁRIO -->
-        <a href="{% url 'settings' %}"
-           class="group flex items-center gap-3 p-3 mt-6 rounded-xl border border-gray-200
-                  bg-white hover:bg-gray-50 transition">
-            <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
-                {% if user.userprofile.avatar %}
-                    <img src="{{ user.userprofile.avatar.url }}"
-                         alt="{{ display_name }}"
-                         class="h-full w-full object-cover">
-                {% else %}
-                    <span class="text-sm font-semibold text-gray-700">
-                        {{ display_name|initials_from_name }}
-                    </span>
-                {% endif %}
-            </div>
-            <div class="min-w-0">
-                <p class="text-sm font-semibold text-red-500 truncate">
-                    {{ display_name }}
-                </p>
-                <p class="text-xs text-red-400 truncate">
-                    @{{ user.username }}
-                </p>
-            </div>
-        </a>
+        {# CARTÃO DO USUÁRIO NO RODAPÉ DO MENU #}
+        <div class="mt-auto">
+            <a href="{% url 'settings' %}" class="group flex items-center gap-3 p-3 mt-6 rounded-xl border border-gray-200 bg-white/5 hover:bg-white/10 transition">
+                <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+                    {% if user.userprofile.avatar %}
+                        <img src="{{ user.userprofile.avatar.url }}" alt="{{ display_name }}" class="h-full w-full object-cover">
+                    {% else %}
+                        <span class="text-sm font-semibold text-gray-700">
+                            {{ display_name|initials_from_name }}
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-red-500 truncate">{{ display_name }}</p>
+                    <p class="text-xs text-red-400 truncate">@{{ user.username }}</p>
+                </div>
+            </a>
+        </div>
 
     {% else %}
         <nav class="flex flex-col gap-3 mt-10">
-            <a href="{% url 'login' %}"
-               class="block text-center px-4 py-3 text-base font-semibold text-white
-                      bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">
-                Entrar
-            </a>
-            <a href="{% url 'registro' %}"
-               class="text-center mt-3 bg-red-600 hover:bg-red-700 text-white text-sm
-                      font-semibold py-2 px-4 rounded-md transition">
-                Cadastrar
-            </a>
+            <a href="{% url 'login' %}" class="block text-center px-4 py-3 text-base font-semibold text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition">Entrar</a>
+            <a href="{% url 'registro' %}" class="text-center mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold py-2 px-4 rounded-md transition">Cadastrar</a>
         </nav>
     {% endif %}
 </aside>
 
-<!-- JS: abre/fecha sidebar -->
+{# SCRIPT DO MENU (com proteção pra não quebrar) #}
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const menuBtn = document.getElementById('menuBtn');
-        const sidebarMenuBtn = document.getElementById('sidebarMenuBtn');
-        const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebarMenuBtn = document.getElementById('sidebarMenuBtn');
+    const sidebar = document.getElementById('sidebar');
 
-        function toggleSidebar() {
-            sidebar.classList.toggle('-translate-x-full');
-        }
+    function toggleSidebar() {
+        sidebar.classList.toggle('-translate-x-full');
+    }
 
-        if (menuBtn) {
-            menuBtn.addEventListener('click', toggleSidebar);
-        }
-        if (sidebarMenuBtn) {
-            sidebarMenuBtn.addEventListener('click', toggleSidebar);
-        }
-    });
+    if (menuBtn) {
+        menuBtn.addEventListener('click', toggleSidebar);
+    }
+    if (sidebarMenuBtn) {
+        sidebarMenuBtn.addEventListener('click', toggleSidebar);
+    }
 </script>
 
-<!-- CONTEÚDO PRINCIPAL -->
+{# CONTEÚDO PRINCIPAL #}
 <div class="pt-6 px-6">
     {% block content %}{% endblock %}
 </div>
 
+{# WIDGET DO STREAK DIÁRIO (voltando!) #}
+{% if user.is_authenticated and perfil %}
+<div class="fixed bottom-6 right-6 bg-white border border-gray-200 shadow-xl rounded-2xl px-5 py-4 z-40">
+    <p class="text-sm text-gray-600">🔥 Seu streak:</p>
+    <p class="text-2xl font-bold text-red-600">{{ perfil.leitura_streak }} dia(s)</p>
+    <a href="{% url 'streak' %}" class="text-xs text-red-500 hover:text-red-700 font-medium">Ver mais</a>
+</div>
+{% endif %}
+
 </body>
 </html>
-
