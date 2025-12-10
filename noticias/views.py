@@ -4,7 +4,6 @@ from django.contrib.auth import login, logout
 from django.contrib import messages
 from datetime import date, timedelta
 from .models import Interest, Noticia, Perfil, CheckIn, Goal, DiarioEntry, UserProfile, Categoria
-from .forms import UsernameChangeForm, ProfileForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 # -----------------------------
