@@ -26,7 +26,7 @@
 
             {# BOTÃO HAMBÚRGUER — FICA FIXO NO CANTO ESQUERDO #}
             <button id="menuBtn"
-                class="fixed top-4 left-4 p-2 rounded-md bg-white/90 backdrop-blur border border-gray-200 shadow z-50 hover:bg-white transition">
+                class="fixed top-4 left-4 p-2 rounded-md bg-white/90 backdrop-blur border border-gray-200 shadow z-50 hover:bg-white transition-all duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                      viewBox="0 0 24 24" stroke-width="1.8" stroke="#dc2626"
                      class="w-8 h-8">
@@ -48,8 +48,7 @@
 {# SIDEBAR LATERAL #}
 <aside
     id="sidebar"
-    class="fixed left-0 top-0 h-full w-64 bg-black border-r border-gray-200 p-6 shadow-2xl
-           transform -translate-x-full transition-transform duration-300 z-50 flex flex-col"
+    class="fixed left-0 top-0 h-full w-64 bg-black border-r border-gray-200 p-6 shadow-2xl -translate-x-full transition-transform duration-300 z-50 flex flex-col
 >
     {% if user.is_authenticated %}
         <h2 id="sidebarMenuBtn"
@@ -143,8 +142,25 @@
     const sidebarMenuBtn = document.getElementById('sidebarMenuBtn');
     const sidebar = document.getElementById('sidebar');
 
+    function updateMenuButtonPosition() {
+        if (!menuBtn || !sidebar) return;
+
+        // Se a sidebar estiver visível (SEM -translate-x-full)
+        if (!sidebar.classList.contains('-translate-x-full')) {
+            // Coloca o botão do lado da sidebar (w-64 = 16rem → left-72 = 18rem)
+            menuBtn.classList.remove('left-4');
+            menuBtn.classList.add('left-72');
+        } else {
+            // Sidebar fechada → botão grudadinho à esquerda
+            menuBtn.classList.remove('left-72');
+            menuBtn.classList.add('left-4');
+        }
+    }
+
     function toggleSidebar() {
+        if (!sidebar) return;
         sidebar.classList.toggle('-translate-x-full');
+        updateMenuButtonPosition();
     }
 
     if (menuBtn) {
@@ -153,7 +169,11 @@
     if (sidebarMenuBtn) {
         sidebarMenuBtn.addEventListener('click', toggleSidebar);
     }
+
+    // Garante posição correta no carregamento da página
+    updateMenuButtonPosition();
 </script>
+
 
 {# CONTEÚDO PRINCIPAL #}
 <div class="pt-6 px-6">
