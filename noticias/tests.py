@@ -1,4 +1,4 @@
-# Em /noticias/tests.py (VERSÃO CORRIGIDA PARA NOVO BASE.HTML)
+
 
 import os
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -63,7 +63,7 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         self.driver.find_element(By.NAME, 'password').send_keys(self.password)
         time.sleep(0.5)
         
-        # O seletor do botão pode variar dependendo do seu HTML de login, mas o genérico funciona
+        
         try:
             self.driver.find_element(By.XPATH, "//button[contains(., 'Entrar')]").click()
         except:
@@ -75,37 +75,37 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         print(f"\nSetup: Usuário '{self.username}' logado e pronto para o teste.")
         time.sleep(1)
 
-    # ===================================================================
-    # HELPER: NAVEGAÇÃO PELO MENU (NOVO)
-    # ===================================================================
+    
+    
+    
     def abrir_menu_navegar(self, link_text_partial):
         """
         Abre o menu lateral (que agora é oculto) e clica no link desejado.
         """
         driver = self.driver
         
-        # 1. Clica no botão de abrir o menu (Hamburguer)
+        
         menu_btn = self.wait.until(EC.element_to_be_clickable((By.ID, "menuBtn")))
         menu_btn.click()
         
-        # 2. Aguarda o menu lateral deslizar (ficar visível)
+        
         sidebar = driver.find_element(By.ID, "sidebar")
-        # Pequena pausa para animação do CSS transition
+        
         time.sleep(0.5) 
         
-        # 3. Clica no link dentro do menu
+        
         link = self.wait.until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, link_text_partial)))
         link.click()
 
-    # ===================================================================
-    # TESTES DE FLUXO
-    # ===================================================================
+    
+    
+    
 
     def test_fluxo_interesses_e_rotina(self):
         print("Iniciando: test_fluxo_interesses_e_rotina")
         driver = self.driver
         
-        # Usa o helper para navegar pelo menu
+        
         self.abrir_menu_navegar("Interesses")
         
         self.wait.until(EC.text_to_be_present_in_element(self.MAIN_H1_SELECTOR, "Seus Interesses"))
@@ -121,7 +121,7 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         self.wait.until(EC.text_to_be_present_in_element((By.CLASS_NAME, 'bg-green-100'), "Interesse \"Testes Automatizados\" adicionado!"))
         time.sleep(1)
         
-        # Navega para Rotina via menu
+        
         self.abrir_menu_navegar("Rotina")
         
         self.wait.until(EC.text_to_be_present_in_element(self.MAIN_H1_SELECTOR, "Rotina Semanal"))
@@ -160,7 +160,7 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
     def test_fluxo_streak(self):
         print("Iniciando: test_fluxo_streak")
         driver = self.driver
-        # O widget de streak fica na dashboard, não precisa abrir menu
+        
         widget = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.fixed")))
         self.assertIn("0 dia(s)", widget.text)
         
@@ -188,7 +188,7 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         print("Iniciando: test_fluxo_diario_completo")
         driver = self.driver
         
-        # Navega para Diário via menu
+        
         self.abrir_menu_navegar("Diário")
         
         self.wait.until(EC.text_to_be_present_in_element(self.MAIN_H1_SELECTOR, "Diário do Aprendizado"))
@@ -238,7 +238,7 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         print("Iniciando: test_resumo_semanal_cenario_3 (Novo Usuário)")
         driver = self.driver
         
-        # Navega via menu
+        
         self.abrir_menu_navegar("Resumo Semanal")
         
         self.wait.until(EC.text_to_be_present_in_element(self.MAIN_H1_SELECTOR, "Resumo Semanal"))
@@ -293,9 +293,9 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         print("Verificado: Todas as atividades (Cenário 1) exibidas.")
         time.sleep(2)
 
-    # ===================================================================
-    # TESTES: FILTRO DE TEMAS
-    # ===================================================================
+    
+    
+    
 
     def test_filtro_temas_cenario_3_erro_vazio(self):
         print("Iniciando: test_filtro_temas_cenario_3 (Erro Vazio)")
@@ -304,10 +304,10 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         Categoria.objects.create(nome="Esportes")
         Categoria.objects.create(nome="Tecnologia")
         
-        # 1. Remove categorias e GARANTE que salvou
+        
         self.user.userprofile.categorias_seguidas.clear()
         
-        # 2. Navega DIRETAMENTE para a página de Temas
+        
         driver.get(self.live_server_url + '/opcoes-de-temas/')
         self.wait.until(EC.text_to_be_present_in_element(self.MAIN_H1_SELECTOR, "Opções de Temas"))
         print("Navegou para a página de Temas.")
@@ -333,7 +333,7 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         Noticia.objects.create(titulo="Notícia de Tecnologia 1", categoria=cat_tech)
         Noticia.objects.create(titulo="Notícia de Mitologia 1", categoria=cat_mito)
         
-        # Link na Home geralmente não está no menu lateral, mas no corpo
+        
         driver.find_element(By.PARTIAL_LINK_TEXT, "Alterar Temas").click()
         self.wait.until(EC.text_to_be_present_in_element(self.MAIN_H1_SELECTOR, "Opções de Temas"))
         print("Navegou para a página de Temas (pelo link da Home).")
@@ -348,7 +348,7 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         self.wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'h2'), "Dashboard - MeuJornal"))
         print("Navegou para a Home (Dashboard) com filtros salvos.")
         
-        # Verifica DENTRO do grid
+        
         grid_noticias = driver.find_element(By.CSS_SELECTOR, "div.mt-12 div.grid").text
         
         self.assertIn("Notícia de Esporte 1", grid_noticias)
@@ -360,8 +360,8 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         driver.find_element(By.PARTIAL_LINK_TEXT, "Alterar Temas").click()
         self.wait.until(EC.text_to_be_present_in_element(self.MAIN_H1_SELECTOR, "Opções de Temas"))
         
-        driver.find_element(By.CSS_SELECTOR, f"input[value='{cat_esportes.id}']").click() # Desmarca
-        driver.find_element(By.CSS_SELECTOR, f"input[value='{cat_mito.id}']").click() # Marca
+        driver.find_element(By.CSS_SELECTOR, f"input[value='{cat_esportes.id}']").click() 
+        driver.find_element(By.CSS_SELECTOR, f"input[value='{cat_mito.id}']").click() 
         time.sleep(0.5)
         
         driver.find_element(By.XPATH, "//button[contains(., 'Salvar e ver Dashboard')]").click()
@@ -377,63 +377,63 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         time.sleep(1)
 
 
-    # ===================================================================
-    # TESTES: CALENDÁRIO DE LEITURA (VERSÃO FINAL UNIFICADA)
-    # ===================================================================
+    
+    
+    
 
     def test_calendario_cenarios_1_2_3(self):
         print("Iniciando: test_calendario_cenarios_1_2_3")
         driver = self.driver
         hoje = timezone.localdate()
         
-        # 1. Navega para o Calendário VIA MENU LATERAL
+        
         self.abrir_menu_navegar("Calendário")
         
         calendario_h2_selector = (By.CSS_SELECTOR, "main h2")
         self.wait.until(EC.text_to_be_present_in_element(calendario_h2_selector, "Calendário de Leitura"))
         print("Navegou para a página de Calendário.")
         
-        # 2. Verifica o dia atual (Azul)
+        
         dia_azul = driver.find_element(By.XPATH, f"//div[contains(@class, 'bg-blue-600')]//span[text()='{hoje.day}']")
         self.assertTrue(dia_azul.is_displayed())
         print("Verificado (Cenário 3): Dia atual está Azul.")
         time.sleep(1)
 
-        # 3. Prepara os dados (Dia 1 ou 2 do mês atual)
+        
         dia_teste = 1
         if hoje.day == 1:
             dia_teste = 2
             
         data_teste = date(hoje.year, hoje.month, dia_teste)
         
-        # Limpa tudo antes
+        
         CheckIn.objects.filter(usuario=self.user).delete()
         DiarioEntry.objects.filter(usuario=self.user).delete()
         
-        # 1. Cria e força a data do Check-in
+        
         ck = CheckIn.objects.create(usuario=self.user) 
         CheckIn.objects.filter(pk=ck.pk).update(data_checkin=data_teste)
 
-        # 2. Cria e força a data da Anotação
+        
         anotacao = DiarioEntry.objects.create(usuario=self.user, texto="Anotação teste")
         DiarioEntry.objects.filter(pk=anotacao.pk).update(data_criacao=data_teste)
         
         print(f"Dados de teste criados e forçados para o dia {dia_teste}.")
 
-        # 4. Recarrega a página FORÇANDO A URL (para ver a atualização)
+        
         url_calendario = f"{self.live_server_url}/routine/calendario/"
         driver.get(url_calendario)
         
         self.wait.until(EC.text_to_be_present_in_element(calendario_h2_selector, "Calendário de Leitura"))
         print("Página recarregada com dados.")
 
-        # 5. Procura o dia VERDE (Check-in)
+        
         xpath_verde = f"//div[contains(@class, 'bg-green-500')]//span[text()='{dia_teste}']"
         dia_verde_elem = self.wait.until(EC.presence_of_element_located((By.XPATH, xpath_verde)))
         self.assertTrue(dia_verde_elem.is_displayed())
         print(f"Verificado (Cenário 1): Dia {dia_teste} com check-in está Verde.")
         
-        # 6. Verifica a Estrela (Anotação)
+        
         dia_verde_div = dia_verde_elem.find_element(By.XPATH, "./..")
         anotacao_star = dia_verde_div.find_element(By.XPATH, ".//span[@title='Anotação no diário']")
         self.assertTrue(anotacao_star.is_displayed())
@@ -442,9 +442,9 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         print("Teste de fluxo (Calendário) concluído!")
         time.sleep(2)
 
-    # ===================================================================
-    # TESTES: SUGESTÃO DO DIA
-    # ===================================================================
+    
+    
+    
 
     def test_sugestao_dia_cenario_2_sem_noticias(self):
         print("Iniciando: test_sugestao_dia_cenario_2 (Sem Notícias)")
@@ -477,8 +477,8 @@ class TestInterfaceUsuario(StaticLiveServerTestCase):
         driver.refresh()
         self.wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, 'h2'), "Dashboard - MeuJornal"))
         
-        # Aqui você adicionaria as asserções se o HTML estivesse pronto para exibir a sugestão
-        # body_text = driver.find_element(By.TAG_NAME, 'body').text
-        # self.assertIn(n1.titulo, body_text) ou algo similar
+        
+        
+        
         
         print("Teste de sugestão preparado (Lógica executada sem erros).")

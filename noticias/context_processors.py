@@ -1,4 +1,4 @@
-# noticias/context_processors.py
+
 from .models import Perfil, CheckIn, UserProfile
 from datetime import date
 
@@ -8,17 +8,17 @@ def streak_processor(request):
     user_profile = None
 
     if request.user.is_authenticated:
-        # ✅ Busca segura (não quebra se não existir)
+        
         perfil = Perfil.objects.filter(usuario=request.user).first()
         user_profile = UserProfile.objects.filter(user=request.user).first()
 
-        # ✅ Só verifica check-in se o perfil existir
+        
         if perfil:
             ja_fez_checkin_hoje = CheckIn.objects.filter(
                 usuario=request.user, data_checkin=date.today()
             ).exists()
 
-    # ✅ Dados de exibição no card
+    
     display_name = None
     avatar_url = None
     if user_profile:
