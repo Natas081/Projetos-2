@@ -183,49 +183,52 @@
 
 {# SCRIPT DO MENU + LAYOUT RESPONSIVO #}
 <script>
-    const menuBtn = document.getElementById('menuBtn');
-    const sidebarMenuBtn = document.getElementById('sidebarMenuBtn');
-    const sidebar = document.getElementById('sidebar');
-    const pageContent = document.getElementById('pageContent');
+    document.addEventListener('DOMContentLoaded', function () {
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebarMenuBtn = document.getElementById('sidebarMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const pageContent = document.getElementById('pageContent');
 
-    function updateLayout() {
-        if (!menuBtn || !sidebar || !pageContent) return;
+        function updateLayout() {
+            if (!menuBtn || !sidebar || !pageContent) return;
 
-        const isOpen = !sidebar.classList.contains('-translate-x-full');
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
 
-        if (isOpen) {
-            // botão encostado na sidebar (w-64 = 16rem -> left-72 ~ 18rem)
-            menuBtn.classList.remove('left-4');
-            menuBtn.classList.add('left-72');
+            if (isOpen) {
+                // botão encostado na sidebar (w-64 = 16rem → left-72 ~ 18rem)
+                menuBtn.classList.remove('left-4');
+                menuBtn.classList.add('left-72');
 
-            // conteúdo deslocado para a direita
-            pageContent.classList.add('ml-64');
-        } else {
-            // sidebar fechada → botão grudadinho à esquerda
-            menuBtn.classList.remove('left-72');
-            menuBtn.classList.add('left-4');
+                // conteúdo deslocado para a direita
+                pageContent.classList.add('ml-64');
+            } else {
+                // sidebar fechada → botão grudadinho à esquerda
+                menuBtn.classList.remove('left-72');
+                menuBtn.classList.add('left-4');
 
-            // conteúdo volta para o lugar
-            pageContent.classList.remove('ml-64');
+                // conteúdo volta pro lugar
+                pageContent.classList.remove('ml-64');
+            }
         }
-    }
 
-    function toggleSidebar() {
-        if (!sidebar) return;
-        sidebar.classList.toggle('-translate-x-full');
+        function toggleSidebar() {
+            if (!sidebar) return;
+            sidebar.classList.toggle('-translate-x-full');
+            updateLayout();
+        }
+
+        if (menuBtn) {
+            menuBtn.addEventListener('click', toggleSidebar);
+        }
+        if (sidebarMenuBtn) {
+            sidebarMenuBtn.addEventListener('click', toggleSidebar);
+        }
+
+        // Garante layout correto assim que a página carrega
         updateLayout();
-    }
-
-    if (menuBtn) {
-        menuBtn.addEventListener('click', toggleSidebar);
-    }
-    if (sidebarMenuBtn) {
-        sidebarMenuBtn.addEventListener('click', toggleSidebar);
-    }
-
-    // Garante layout correto no carregamento da página
-    document.addEventListener('DOMContentLoaded', updateLayout);
+    });
 </script>
+
 
 {# CONTEÚDO PRINCIPAL #}
 <main id="pageContent" class="pt-6 px-6 transition-all duration-300">
