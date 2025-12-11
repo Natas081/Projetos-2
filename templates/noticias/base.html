@@ -177,6 +177,26 @@
 
 {# CONTEÚDO PRINCIPAL #}
 <div class="pt-6 px-6">
+    
+    {# 🔔 Bloco GLOBAL de mensagens #}
+    {% if messages %}
+        {% for message in messages %}
+            <div
+                class="mb-4 px-4 py-3 rounded-lg border
+                {% if 'success' in message.tags %}
+                    bg-green-100 border-green-300 text-green-800
+                {% elif 'error' in message.tags %}
+                    bg-red-100 border-red-300 text-red-800
+                {% elif 'warning' in message.tags %}
+                    bg-yellow-100 border-yellow-300 text-yellow-800
+                {% else %}
+                    bg-blue-100 border-blue-300 text-blue-800
+                {% endif %}
+                ">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     {% block content %}{% endblock %}
 </div>
 
